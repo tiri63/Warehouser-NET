@@ -38,7 +38,7 @@ namespace Warehouser_NET
                         if (jn["ret"].ToString() == "0")
                         {
                             HiroUtils.userName = userName;
-                            HiroUtils.userDepart = jn["depart"].ToString();
+                            HiroUtils.userDepart = jn["depart"]["name"].ToString();
                             HiroUtils.userToken = jn["token"].ToString();
                             HiroUtils.userNickname = jn["nickname"].ToString();
                             HiroUtils.Write_Ini(HiroUtils.ConfigFilePath, "User", "UserName", HiroUtils.userName);

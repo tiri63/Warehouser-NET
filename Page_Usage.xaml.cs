@@ -24,6 +24,7 @@ namespace Warehouser_NET
         {
             InitializeComponent();
             ItemData.ItemsSource = HiroUtils.usages;
+            StatusLabel.Content = string.Format("共计{0}项", HiroUtils.usages.Count);
         }
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
@@ -33,7 +34,7 @@ namespace Warehouser_NET
         private void ItemData_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (ItemData.SelectedIndex != -1)
-                HiroUtils.Notify("用途信息 - 库存管理", usage_all[ItemData.SelectedIndex].ToString());
+                HiroUtils.Notify("用途信息 - 库存管理", HiroUtils.usages[ItemData.SelectedIndex].ToString());
         }
     }
 }

@@ -7,7 +7,6 @@
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
       Title="Page_Usage" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" Loaded="Page_Loaded">
-
     <Grid  x:Name="BaseGrid">
         <DockPanel x:Name="ItemPanel">
             <DockPanel x:Name="SubPanel" DockPanel.Dock="Top">
@@ -20,7 +19,8 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn Binding="{Binding Code, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="唯一编码" FontFamily="Microsoft YaHei" CanUserResize="True" Width="40"/>
                             <DataGridTextColumn Binding="{Binding Alias, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="名称" FontFamily="Microsoft YaHei" CanUserResize="True" Width="40"/>
-                            <DataGridTextColumn Binding="{Binding Info, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="型号" FontFamily="Microsoft YaHei" CanUserResize="True" Width="160"/>
+                            <DataGridTextColumn Binding="{Binding Info, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="信息" FontFamily="Microsoft YaHei" CanUserResize="True" Width="160"/>
+                            <DataGridTextColumn Binding="{Binding HideStr, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="可见性" FontFamily="Microsoft YaHei" CanUserResize="True" Width="160"/>
                         </DataGrid.Columns>
                         <DataGrid.ColumnHeaderStyle>
                             <Style TargetType="{x:Type DataGridColumnHeader}">

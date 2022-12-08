@@ -34,7 +34,14 @@ namespace Warehouser_NET
 
                         }
                         Thread.Sleep(100);
-                        HiroUtils.usages.Add(new UsageClass(int.Parse(jo["id"].ToString()), jo["name"].ToString(), info));
+                        HiroUtils.usages.Add(new UsageClass()
+                        {
+                            Code = int.Parse(jo["id"].ToString()),
+                            Alias = jo["name"].ToString(),
+                            Info = info,
+                            Hide = jo["hide"].ToString().ToLower().Equals("true") || jo["hide"].ToString().Equals("1"),
+                            HideStr = jo["hide"].ToString().ToLower().Equals("true") || jo["hide"].ToString().Equals("1") ? "隐藏" : "可见"
+                        });
                     }
                     Thread.Sleep(1000);
 

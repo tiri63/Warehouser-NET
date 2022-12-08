@@ -30,8 +30,11 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn Binding="{Binding Shelf.FID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="货架" FontFamily="Microsoft YaHei" CanUserResize="True" Width="40"/>
                             <DataGridTextColumn Binding="{Binding Shelf.Depart.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="部门" FontFamily="Microsoft YaHei" CanUserResize="True" Width="40"/>
-                            <DataGridTextColumn Binding="{Binding UID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="唯一编码" FontFamily="Microsoft YaHei" CanUserResize="True" Width="40"/>
-                            <DataGridTextColumn Binding="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="名称" FontFamily="Microsoft YaHei" CanUserResize="True" Width="160"/>
+                            <DataGridTextColumn Binding="{Binding UID.UID, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="唯一编码" FontFamily="Microsoft YaHei" CanUserResize="True" Width="40"/>
+                            <DataGridTextColumn Binding="{Binding UID.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="名称" FontFamily="Microsoft YaHei" CanUserResize="True" Width="160"/>
+                            <DataGridTextColumn Binding="{Binding UID.Model, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="型号" FontFamily="Microsoft YaHei" CanUserResize="True" Width="160"/>
+                            <DataGridTextColumn Binding="{Binding UID.Unit, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="计量单位" FontFamily="Microsoft YaHei" CanUserResize="True" Width="160"/>
+                            <DataGridTextColumn Binding="{Binding UID.Price, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="价格" FontFamily="Microsoft YaHei" CanUserResize="True" Width="160"/>
                             <DataGridTextColumn Binding="{Binding Count, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="数量" FontFamily="Microsoft YaHei" CanUserResize="True" Width="160"/>
                             <DataGridTextColumn Binding="{Binding FunctionString, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Header="用途" FontFamily="Microsoft YaHei" CanUserResize="True" Width="160"/>
                         </DataGrid.Columns>

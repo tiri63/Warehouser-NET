@@ -37,8 +37,12 @@ namespace Warehouser_NET
         {
             try
             {
-                var jo = JsonObject.Parse(HiroUtils.SendRequest("/depart", new List<string>() { "action" }, new List<string>() { "6" }));
+                var jo = JsonObject.Parse(HiroUtils.SendRequest("/user", new List<string>() { "action" }, new List<string>() { "6" }));
                 var ja = jo["msg"].AsArray();
+                Dispatcher.Invoke(() =>
+                {
+                    StatusLabel.Content = string.Format("共计{0}项", ja.Count);
+                });
                 for (int i = 0; i < ja.Count; i++)
                 {
                     Dispatcher.Invoke(() =>

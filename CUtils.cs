@@ -331,8 +331,8 @@ namespace Warehouser_NET
         {
             return $"部门 : \t\t{Depart.ToString()}{Environment.NewLine}" +
                 $"货架 ID : \t{FID}{Environment.NewLine}" +
-                $"主 ID : \t{MID}{Environment.NewLine}" +
-                $"副 ID : \t{SID}{Environment.NewLine}" +
+                $"\t主 ID : \t{MID}{Environment.NewLine}" +
+                $"\t副 ID : \t{SID}{Environment.NewLine}" +
                 $"货架别称 : \t{Alias}{Environment.NewLine}" +
                 $"货架信息 : \t{Info}";
         }
@@ -345,6 +345,7 @@ namespace Warehouser_NET
         private string alias;
         private string? info;
         private bool hide;
+        private string hidestr;
 
         public static UsageClass Parse(string str)
         {
@@ -363,7 +364,8 @@ namespace Warehouser_NET
                 Code = code,
                 Alias = json["name"].ToString(),
                 Info = json["info"].ToString(),
-                Hide = json["hide"].ToString()
+                Hide = json["hide"].ToString().ToLower().Equals("true") || json["hide"].ToString().Equals("1"),
+                HideStr = json["hide"].ToString().ToLower().Equals("true") || json["hide"].ToString().Equals("1") ? "隐藏" : "可见"
             };
         }
 
@@ -402,14 +404,23 @@ namespace Warehouser_NET
             }
         }
 
-        public string Hide
+        public bool Hide
         {
-            get { return hide ? "true" : "false"; }
+            get { return hide; }
             set
             {
-                hide = value.ToLower().Equals("true") || value.ToLower().Equals("1");
-                Hide = hide ? "true" : "false";
+                hide = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Hide)));
+            }
+        }
+
+        public string HideStr
+        {
+            get { return hidestr; }
+            set
+            {
+                hidestr = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HideStr)));
             }
         }
 
@@ -418,7 +429,8 @@ namespace Warehouser_NET
             Code = c;
             Alias = a;
             Info = i;
-            Hide = "false";
+            Hide = false;
+            HideStr = "可见";
         }
 
         public UsageClass()
@@ -432,10 +444,10 @@ namespace Warehouser_NET
 
         public override string ToString()
         {
-            return $"代码 : \t\t{code}{Environment.NewLine}" +
-                $"名称 : \t\t{alias}{Environment.NewLine}" +
-                $"附加信息 :\t{Info}{Environment.NewLine}" +
-                $"是否可见 :\t{(Hide.ToLower().Equals("true") ? "否" : "是")}";
+            return $"代码 : \t\t{Code}{Environment.NewLine}" +
+                $"名称 : \t\t{Alias}{Environment.NewLine}" +
+                $"附加信息 :\t{(Info == null ? string.Empty : Info)}{Environment.NewLine}" +
+                $"可见性 :\t\t{(HideStr)}";
         }
     }
 
