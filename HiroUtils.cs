@@ -79,10 +79,10 @@ public class HiroUtils
     {
         CreateFolder(Path_Prepare(LogFilePath));
         CreateFolder(Path_Prepare(ConfigFilePath));
-        userName = Read_Ini(ConfigFilePath, "User", "UserName", string.Empty);
-        userToken = Read_Ini(ConfigFilePath, "User", "UserToken", string.Empty);
-        userDepart = Read_Ini(ConfigFilePath, "User", "UserDepart", string.Empty);
-        userNickname = Read_Ini(ConfigFilePath, "User", "NickName", string.Empty);
+        userName = Read_Ini(ConfigFilePath, "User", "UserName", " ");
+        userToken = Read_Ini(ConfigFilePath, "User", "UserToken", " ");
+        userDepart = Read_Ini(ConfigFilePath, "User", "UserDepart", " ");
+        userNickname = Read_Ini(ConfigFilePath, "User", "NickName", " ");
     }
     internal static void Notify(string title, string content)
     {
