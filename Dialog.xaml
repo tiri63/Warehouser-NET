@@ -1,0 +1,12 @@
+﻿<Window x:Class="Warehouser_NET.Dialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Warehouser_NET"
+        mc:Ignorable="d"
+        Title="信息" Width="300" WindowStartupLocation="CenterScreen" Height="250">
+    <Grid>
+        <TextBox x:Name="Info" FontFamily="Microsoft YaHei"  Foreground="{DynamicResource FontColorBrush}" Background="{DynamicResource BackgroundColorBrush}" AcceptsReturn="True" IsReadOnly="True" Text="示例信息&#xD;&#xA;&#xD;&#xA;test info" FontSize="16" FontWeight="Bold" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"/>
+    </Grid>
+</Window>

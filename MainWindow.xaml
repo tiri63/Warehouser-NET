@@ -1,0 +1,12 @@
+﻿<Window x:Name="StartWin" x:Class="Warehouser_NET.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Warehouser_NET"
+        mc:Ignorable="d"
+        Title="初始化……" Height="245" Width="445" ResizeMode="NoResize" WindowStyle="None" WindowStartupLocation="CenterScreen" ShowInTaskbar="False" Background="{DynamicResource BackgroundColorBrush}" Closing="StartWin_Closing">
+    <Grid>
+        <Label x:Name="StartWinLabel" Content="正在初始化……" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,10"></Label>
+    </Grid>
+</Window>

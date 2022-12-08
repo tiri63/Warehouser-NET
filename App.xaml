@@ -1,0 +1,28 @@
+﻿<Application x:Class="Warehouser_NET.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Warehouser_NET"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <Color x:Key="FontColor">#FF000000</Color>
+        <SolidColorBrush x:Key="FontColorBrush">
+            <SolidColorBrush.Color>#FF000000</SolidColorBrush.Color>
+        </SolidColorBrush>
+        <Color x:Key="BackgroundColor">#FFFFFFFF</Color>
+        <SolidColorBrush x:Key="BackgroundColorBrush">
+            <SolidColorBrush.Color>#FFFFFFFF</SolidColorBrush.Color>
+        </SolidColorBrush>
+        <Color x:Key="AccentColor">#FF3498DB</Color>
+        <SolidColorBrush x:Key="AccentColorBrush">
+            <SolidColorBrush.Color>#FF3498DB</SolidColorBrush.Color>
+        </SolidColorBrush>
+        <Color x:Key="BackgroundDimColor">#FF333333</Color>
+        <SolidColorBrush x:Key="BackgroundDimColorBrush">
+            <SolidColorBrush.Color>#FFAAAAAA</SolidColorBrush.Color>
+        </SolidColorBrush>
+        <Color x:Key="AccentColorDim">#FF1A4C6C</Color>
+        <SolidColorBrush x:Key="AccentColorDimBrush">
+            <SolidColorBrush.Color>#FF1A4C6C</SolidColorBrush.Color>
+        </SolidColorBrush>
+    </Application.Resources>
+</Application>

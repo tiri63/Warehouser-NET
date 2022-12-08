@@ -1,0 +1,34 @@
+﻿<Window x:Name="FunWin" x:Class="Warehouser_NET.FunWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Warehouser_NET"
+        mc:Ignorable="d"
+        Title="库存管理" Height="450" Width="800" Background="{DynamicResource BackgroundColorBrush}" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" Closing="FunWin_Closing">
+    <Grid>
+        <DockPanel x:Name="Dock" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+            <DockPanel x:Name="UpDock" DockPanel.Dock="Top">
+                <Grid x:Name="NaviDock" DockPanel.Dock="Left"></Grid>
+                <Grid x:Name="UserDock" DockPanel.Dock="Right">
+                    <Label x:Name="UserName" Content="默认用户" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="{DynamicResource FontColorBrush}" Margin="0,0,55,0"/>
+                    <Button x:Name="LogOut" Content="登出" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="{DynamicResource FontColorBrush}" Click="LogOut_Click" Width="50"></Button>
+                </Grid>
+            </DockPanel>
+            <Grid x:Name="SideGrid" DockPanel.Dock="Left">
+                <Label x:Name="Label_Home" Margin="0,0,0,0" Content="主页" Height="30" Width="80" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MouseLeftButtonDown="Label_Home_MouseLeftButtonDown"></Label>
+                <Label x:Name="Label_Items" Margin="0,30,0,0" Content="在库" Height="30" Width="80" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MouseLeftButtonDown="Label_Items_MouseLeftButtonDown"></Label>
+                <Label x:Name="Label_Shelf" Margin="0,60,0,0" Content="货架" Height="30" Width="80" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MouseLeftButtonDown="Label_Shelf_MouseLeftButtonDown"></Label>
+                <Label x:Name="Label_Member" Margin="0,90,0,0" Content="人员" Height="30" Width="80" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MouseLeftButtonDown="Label_Member_MouseLeftButtonDown"></Label>
+                <Label x:Name="Label_Code" Margin="0,120,0,0" Content="编码" Height="30" Width="80" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MouseLeftButtonDown="Label_Code_MouseLeftButtonDown"></Label>
+                <Label x:Name="Label_Depart" Margin="0,150,0,0" Content="部门" Height="30" Width="80" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MouseLeftButtonDown="Label_Depart_MouseLeftButtonDown"></Label>
+                <Label x:Name="Label_Usage" Margin="0,180,0,0" Content="用途" Height="30" Width="80" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MouseLeftButtonDown="Label_Usage_MouseLeftButtonDown"></Label>
+                <Label x:Name="Label_Settings" Margin="0,210,0,0" Content="设置" Height="30" Width="80" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MouseLeftButtonDown="Label_Settings_MouseLeftButtonDown"></Label>
+                <Label x:Name="Label_About" Margin="0,240,0,0" Content="关于" Height="30" Width="80" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" MouseLeftButtonDown="Label_About_MouseLeftButtonDown"></Label>
+            </Grid>
+            <DockPanel x:Name="NokoriDock">
+                <Frame x:Name="MainExplorer" NavigationUIVisibility="Hidden"></Frame>
+            </DockPanel>
+        </DockPanel>
+    </Grid>
+</Window>
