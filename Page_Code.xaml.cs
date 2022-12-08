@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json.Nodes;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -25,14 +27,36 @@ namespace Warehouser_NET
         {
             InitializeComponent();
             ItemData.ItemsSource = code_all;
-            code_all.Add(new UIDClass()
+            new Thread(() =>
             {
-                Name = "测试物品",
-                UID = "1001",
-                Model = "X-1",
-                Unit = "m",
-                Price = "2.33"
-            });
+                getUIDs();
+            }).Start();
+        }
+
+        private bool getUIDs()
+        {
+            try
+            {
+                var jo = JsonObject.Parse(HiroUtils.SendRequest("/depart", new List<string>() { "action" }, new List<string>() { "3" }));
+                var ja = jo["msg"].AsArray();
+                for (int i = 0; i < ja.Count; i++)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        code_all.Add(UIDClass.Parse(ja[i]));
+                    });
+
+                };
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    HiroUtils.LogError(ex, "Exception.UID.Get");
+                });
+                return false;
+            }
         }
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {

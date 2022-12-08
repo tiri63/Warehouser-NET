@@ -23,13 +23,7 @@ namespace Warehouser_NET
         public Page_Usage()
         {
             InitializeComponent();
-            ItemData.ItemsSource = usage_all;
-            usage_all.Add(new UsageClass()
-            {
-                Code = 1,
-                Alias = "维修",
-                Info = "无注释"
-            });
+            ItemData.ItemsSource = HiroUtils.usages;
         }
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
