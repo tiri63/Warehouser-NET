@@ -20,10 +20,12 @@ namespace Warehouser_NET
     /// </summary>
     public partial class Page_Shelf : Page
     {
-        internal List<ShelfClass> shelf_all = new List<ShelfClass>();
-        internal List<ShelfClass> shelf_search = new List<ShelfClass>();
+        internal System.Collections.ObjectModel.ObservableCollection<ShelfClass> shelf_all = new System.Collections.ObjectModel.ObservableCollection<ShelfClass>();
+        internal System.Collections.ObjectModel.ObservableCollection<ShelfClass> shelf_search = new System.Collections.ObjectModel.ObservableCollection<ShelfClass>();
         internal int flag = 0;
-        public Page_Shelf()
+        internal bool isolated = false;
+        private FunWindow? parent = null;
+        public Page_Shelf(FunWindow parent)
         {
             InitializeComponent();
             ItemData.ItemsSource = shelf_all;
@@ -31,6 +33,7 @@ namespace Warehouser_NET
             {
                 getShelves();
             }).Start();
+            this.parent = parent;
         }
 
         private bool getShelves()

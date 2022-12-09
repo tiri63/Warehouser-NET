@@ -20,9 +20,10 @@ namespace Warehouser_NET
     /// </summary>
     public partial class Page_Code : Page
     {
-        internal List<UIDClass> code_all = new List<UIDClass>();
-        internal List<UIDClass> code_search = new List<UIDClass>();
+        internal System.Collections.ObjectModel.ObservableCollection<UIDClass> code_all = new System.Collections.ObjectModel.ObservableCollection<UIDClass>();
+        internal System.Collections.ObjectModel.ObservableCollection<UIDClass> code_search = new System.Collections.ObjectModel.ObservableCollection<UIDClass>();
         internal int flag = 0;
+        internal bool isolated = false;
         private FunWindow? parent = null;
         public Page_Code(FunWindow parent)
         {

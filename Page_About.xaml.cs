@@ -18,9 +18,12 @@ namespace Warehouser_NET
     /// </summary>
     public partial class Page_About : Page
     {
-        public Page_About()
+        internal bool isolated = false;
+        private FunWindow? parent = null;
+        public Page_About(FunWindow parent)
         {
             InitializeComponent();
+            this.parent = parent;
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)

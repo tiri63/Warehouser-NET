@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties;
 
 namespace Warehouser_NET
 {
@@ -20,10 +21,12 @@ namespace Warehouser_NET
     /// </summary>
     public partial class Page_Depart : Page
     {
-        internal List<DepartClass> depart_all = new List<DepartClass>();
-        internal List<DepartClass> depart_search = new List<DepartClass>();
+        internal System.Collections.ObjectModel.ObservableCollection<DepartClass> depart_all = new System.Collections.ObjectModel.ObservableCollection<DepartClass>();
+        internal System.Collections.ObjectModel.ObservableCollection<DepartClass> depart_search = new System.Collections.ObjectModel.ObservableCollection<DepartClass>();
         internal int flag = 0;
-        public Page_Depart()
+        internal bool isolated = false;
+        private FunWindow? parent = null;
+        public Page_Depart(FunWindow parent)
         {
             InitializeComponent();
             ItemData.ItemsSource = depart_all;
@@ -31,6 +34,7 @@ namespace Warehouser_NET
             {
                 getDeparts();
             }).Start();
+            this.parent = parent;
         }
 
         private bool getDeparts()

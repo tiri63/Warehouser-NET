@@ -18,13 +18,16 @@ namespace Warehouser_NET
     /// </summary>
     public partial class Page_Usage : Page
     {
-        internal List<UsageClass> usage_all = new List<UsageClass>();
+        internal System.Collections.ObjectModel.ObservableCollection<UsageClass> usage_all = new System.Collections.ObjectModel.ObservableCollection<UsageClass>();
         //internal List<UsageClass> usage_search = new List<UsageClass>();
-        public Page_Usage()
+        internal bool isolated = false;
+        private FunWindow? parent = null;
+        public Page_Usage(FunWindow parent)
         {
             InitializeComponent();
             ItemData.ItemsSource = HiroUtils.usages;
             StatusLabel.Content = string.Format("共计{0}项", HiroUtils.usages.Count);
+            this.parent = parent;
         }
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {

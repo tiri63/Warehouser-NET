@@ -24,7 +24,7 @@ public class HiroUtils
     internal static HttpClient? hc = null;
     internal static string LogFilePath = "<current>\\users\\<hiuser>\\log\\";
     internal static string ConfigFilePath = "<current>\\users\\<hiuser>\\user.hsf";
-    internal static List<UsageClass> usages = new List<UsageClass>();
+    internal static System.Collections.ObjectModel.ObservableCollection<UsageClass> usages = new System.Collections.ObjectModel.ObservableCollection<UsageClass>();
     internal static List<string> roles = new List<string>() { "游客", "用户", "管理员" };
     public HiroUtils()
     {

@@ -20,10 +20,12 @@ namespace Warehouser_NET
     /// </summary>
     public partial class Page_Member : Page
     {
-        internal List<UserClass> user_all = new List<UserClass>();
-        internal List<UserClass> user_search = new List<UserClass>();
+        internal System.Collections.ObjectModel.ObservableCollection<UserClass> user_all = new System.Collections.ObjectModel.ObservableCollection<UserClass>();
+        internal System.Collections.ObjectModel.ObservableCollection<UserClass> user_search = new System.Collections.ObjectModel.ObservableCollection<UserClass>();
         internal int flag = 0;
-        public Page_Member()
+        internal bool isolated = false;
+        private FunWindow? parent = null;
+        public Page_Member(FunWindow parent)
         {
             InitializeComponent();
             ItemData.ItemsSource = user_all;
@@ -31,6 +33,7 @@ namespace Warehouser_NET
             {
                 getUsers();
             }).Start();
+            this.parent = parent;
         }
 
         private bool getUsers()

@@ -18,6 +18,11 @@ namespace Warehouser_NET
             {
                 try
                 {
+                    Dispatcher.BeginInvoke(new Action(() =>
+                    {
+                        new FunWindow().Show();
+                    }));
+                    return;
                     HiroUtils.InitializeConfig();
                     HiroUtils.usages.Clear();
                     JsonNode jn = JsonObject.Parse(HiroUtils.SendRequest("/usage", new List<string>() { "action" }, new List<string>() { "2" }));

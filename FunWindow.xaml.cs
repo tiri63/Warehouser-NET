@@ -31,7 +31,7 @@ namespace Warehouser_NET
         {
             InitializeComponent();
             UserName.Content = HiroUtils.userNickname + " (" + HiroUtils.userDepart + ")";
-            pma = new Page_Main();
+            pma = new Page_Main(this);
             MainExplorer.Navigate(pma);
         }
 
@@ -51,56 +51,161 @@ namespace Warehouser_NET
 
         private void Label_About_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            pab ??= new Page_About();
-            MainExplorer.Navigate(pab);
+            pab ??= new Page_About(this);
+            if (!pab.isolated)
+                MainExplorer.Navigate(pab);
+            else
+                SwitchTo(pab);
         }
 
         private void Label_Home_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            pma ??= new Page_Main();
-            MainExplorer.Navigate(pma);
+            pma ??= new Page_Main(this);
+            if (!pma.isolated)
+                MainExplorer.Navigate(pma);
+            else
+                SwitchTo(pma);
         }
 
         private void Label_Items_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            pit ??= new Page_Items();
-            MainExplorer.Navigate(pit);
+            pit ??= new Page_Items(this);
+            if (!pit.isolated)
+                MainExplorer.Navigate(pit);
+            else
+                SwitchTo(pit);
         }
 
         private void Label_Shelf_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            psh ??= new Page_Shelf();
-            MainExplorer.Navigate(psh);
+            psh ??= new Page_Shelf(this);
+            if (!psh.isolated)
+                MainExplorer.Navigate(psh);
+            else
+                SwitchTo(psh);
         }
 
         private void Label_Member_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            pme ??= new Page_Member();
-            MainExplorer.Navigate(pme);
+            pme ??= new Page_Member(this);
+            if (!pme.isolated)
+                MainExplorer.Navigate(pme);
+            else
+                SwitchTo(pme);
         }
 
         private void Label_Code_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             pco ??= new Page_Code(this);
-            MainExplorer.Navigate(pco);
+            if (!pco.isolated)
+                MainExplorer.Navigate(pco);
+            else
+                SwitchTo(pco);
         }
 
         private void Label_Depart_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            pde ??= new Page_Depart();
-            MainExplorer.Navigate(pde);
+            pde ??= new Page_Depart(this);
+            if (!pde.isolated)
+                MainExplorer.Navigate(pde);
+            else
+                SwitchTo(pde);
         }
 
         private void Label_Usage_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            pus ??= new Page_Usage();
-            MainExplorer.Navigate(pus);
+            pus ??= new Page_Usage(this);
+            if (!pus.isolated)
+                MainExplorer.Navigate(pus);
+            else
+                SwitchTo(pus);
         }
 
         private void Label_Settings_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            pse ??= new Page_Settings();
-            MainExplorer.Navigate(pse);
+            pse ??= new Page_Settings(this);
+            if (!pse.isolated)
+                MainExplorer.Navigate(pse);
+            else
+                SwitchTo(pse);
+        }
+
+        private void Label_Items_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            pit ??= new Page_Items(this);
+            pit.isolated = true;
+            new Explorer(pit).Show();
+        }
+
+        private void Label_Code_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            pco ??= new Page_Code(this);
+            pco.isolated = true;
+            new Explorer(pco).Show();
+        }
+
+        private void Label_Shelf_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            psh ??= new Page_Shelf(this);
+            psh.isolated = true;
+            new Explorer(psh).Show();
+        }
+
+        private void Label_Home_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            pma ??= new Page_Main(this);
+            pma.isolated = true;
+            new Explorer(pma).Show();
+        }
+
+        private void Label_Member_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            pme ??= new Page_Member(this);
+            pme.isolated = true;
+            new Explorer(pme).Show();
+        }
+
+        private void Label_Depart_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            pde ??= new Page_Depart(this);
+            pde.isolated = true;
+            new Explorer(pde).Show();
+        }
+
+        private void Label_Usage_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            pus ??= new Page_Usage(this);
+            pus.isolated = true;
+            new Explorer(pus).Show();
+        }
+
+        private void Label_Settings_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            pse ??= new Page_Settings(this);
+            pse.isolated = true;
+            new Explorer(pse).Show();
+        }
+
+        private void Label_About_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            pab ??= new Page_About(this);
+            pab.isolated = true;
+            new Explorer(pab).Show();
+        }
+
+        private void SwitchTo(Page p)
+        {
+            foreach (var win in Application.Current.Windows)
+            {
+                if (win is Explorer)
+                {
+                    var ew = win as Explorer;
+                    if (ew.Content == p)
+                    {
+                        ew.Focus();
+                    }
+                }
+            }
         }
     }
 }

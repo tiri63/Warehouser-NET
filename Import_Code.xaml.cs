@@ -1,23 +1,10 @@
 ﻿using Microsoft.Win32;
-using NPOI.OpenXmlFormats.Spreadsheet;
-using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
-using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Text.Json.Nodes;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Warehouser_NET
 {
@@ -26,17 +13,11 @@ namespace Warehouser_NET
     /// </summary>
     public partial class Import_Code : Page
     {
-        internal class Code4Import
-        {
-            public string UID;
-            public string Name;
-            public string Model;
-            public string Unit;
-            public double Price;
-        }
+        internal System.Collections.ObjectModel.ObservableCollection<UIDClass> iuids = new System.Collections.ObjectModel.ObservableCollection<UIDClass>();
         public Import_Code()
         {
             InitializeComponent();
+            ItemData.ItemsSource = iuids;
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -71,61 +52,84 @@ namespace Warehouser_NET
         {
             Dispatcher.Invoke(() =>
             {
-                ItemData.Items.Clear();
+                iuids.Clear();
             });
-            var excel = WorkbookFactory.Create(path);
-            if (excel.NumberOfSheets < 2)
+            try
             {
-                return false;
-            }
-            var versheet = excel.GetSheetAt(1);
-            if (versheet.LastRowNum < 0)
-            {
-                return false;
-            }
-            var verrow = versheet.GetRow(0);
-            if (verrow.LastCellNum < 0)
-            {
-                return false;
-            }
-            if (verrow.GetCell(0).StringCellValue.Equals("1.0"))
-            {
-                versheet = excel.GetSheetAt(0);
-                if (versheet.LastRowNum < 2)
+                var excel = WorkbookFactory.Create(path);
+                if (excel.NumberOfSheets < 2)
                 {
-                    return false;//no data found
+                    return false;
                 }
-                for (int i = 2; i <= versheet.LastRowNum; i++)
+                var versheet = excel.GetSheetAt(1);
+                if (versheet.LastRowNum < 0)
                 {
-                    var row = versheet.GetRow(i);
-                    if (row.LastCellNum < 5)
+                    return false;
+                }
+                var verrow = versheet.GetRow(0);
+                if (verrow.LastCellNum < 0)
+                {
+                    return false;
+                }
+                if (GetCellValue(verrow.GetCell(0)).Equals("1.0"))
+                {
+                    versheet = excel.GetSheetAt(0);
+                    if (versheet.LastRowNum < 2)
                     {
-                        break;
+                        return false;//no data found
                     }
-                    double price;
-                    if (!double.TryParse(row.GetCell(4).StringCellValue, out price))
-                        break;
-                    Dispatcher.Invoke(() =>
+                    for (int i = 2; i <= versheet.LastRowNum; i++)
                     {
-                        ItemData.Items.Add(new Code4Import()
+                        var row = versheet.GetRow(i);
+                        if (row.LastCellNum < 5)
                         {
-                            UID = row.GetCell(0).StringCellValue,
-                            Name = row.GetCell(1).StringCellValue,
-                            Model = row.GetCell(2).StringCellValue,
-                            Unit = row.GetCell(3).StringCellValue,
-                            Price = price
+                            break;
+                        }
+                        Dispatcher.Invoke(() =>
+                        {
+                            iuids.Add(new UIDClass()
+                            {
+                                UID = GetCellValue(row.GetCell(0)),
+                                Name = GetCellValue(row.GetCell(1)),
+                                Model = GetCellValue(row.GetCell(2)),
+                                Unit = GetCellValue(row.GetCell(3)),
+                                Price = GetCellValue(row.GetCell(4))
+                            });
                         });
-                    });
 
+                    }
+                    return true;
                 }
-                return true;
+                else
+                {
+                    return false;
+                }
             }
-            else
+            catch (Exception ex)
             {
+                HiroUtils.LogError(ex, "Exception.ImportFromFile.Parse");
                 return false;
             }
-
-
+        }
+        private string GetCellValue(ICell cell)
+        {
+            switch (cell.CellType)
+            {
+                case CellType.Numeric:
+                    return cell.NumericCellValue.ToString();
+                case CellType.Formula:
+                    return cell.CellFormula.ToString();
+                case CellType.Boolean:
+                    return cell.BooleanCellValue.ToString();
+                case CellType.String:
+                    return cell.StringCellValue;
+                case CellType.Blank:
+                    return string.Empty;
+                case CellType.Error:
+                    return cell.ErrorCellValue.ToString();
+                default:
+                    return string.Empty;
+            };
         }
 
         private void ImportExcel_Click(object sender, RoutedEventArgs e)
@@ -187,6 +191,16 @@ namespace Warehouser_NET
                     }
                 }).Start();
             }
+        }
+
+        private void ImportClipboard_Click(object sender, RoutedEventArgs e)
+        {
+            string txt = string.Empty;
+            foreach(var f in Clipboard.GetData(DataFormats.Text).ToString().Split("\t"))
+            {
+                txt = txt + "|" + f;
+            }
+            HiroUtils.Notify("1", txt);
         }
     }
 }

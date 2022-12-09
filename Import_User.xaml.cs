@@ -43,7 +43,7 @@ namespace Warehouser_NET
             row.CreateCell(3).SetCellValue("1");
             row.CreateCell(4).SetCellValue("1");
             row.CreateCell(5).SetCellValue("此行为示例数据，导入时会直接忽略。请不要在此行填写真实数据！权限等级：0->游客，只能查看，1->用户，可出入库，2->管理员，可出入库、导入等。");
-            FileStream stream = File.OpenWrite(@path); ;
+            FileStream stream = File.OpenWrite(@path);
             excel.Write(stream);
             stream.Close();
         }
