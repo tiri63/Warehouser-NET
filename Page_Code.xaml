@@ -11,7 +11,7 @@
     <Grid  x:Name="BaseGrid">
         <DockPanel x:Name="ItemPanel">
             <DockPanel x:Name="SubPanel" DockPanel.Dock="Top">
-                <Button x:Name="ImportBtn" Content="新增/导入" VerticalAlignment="Center" HorizontalAlignment="Left" Width="90" Height="20"></Button>
+                <Button x:Name="ImportBtn" Content="新增/导入" VerticalAlignment="Center" HorizontalAlignment="Left" Width="90" Height="20" Click="ImportBtn_Click"></Button>
                 <Label x:Name="StatusLabel" Content="共计{0}项"  VerticalAlignment="Center" HorizontalAlignment="Left"></Label>
                 <Grid x:Name="SearchGrid" VerticalAlignment="Top" HorizontalAlignment="Right" Width="200" DockPanel.Dock="Right">
                     <Label x:Name="SearchTextLabel" Width="200" Content="按回车键搜索" FontStyle="Italic" Margin="{Binding Margin, ElementName=SearchTextBox}" HorizontalAlignment="{Binding HorizontalAlignment, ElementName=SearchTextBox}" VerticalAlignment="{Binding VerticalAlignment, ElementName=SearchTextBox}" VerticalContentAlignment="Center"/>

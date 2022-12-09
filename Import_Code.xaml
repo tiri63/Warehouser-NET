@@ -6,9 +6,63 @@
       xmlns:local="clr-namespace:Warehouser_NET"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="Import_Code" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" Loaded="Page_Loaded" >
+      Title="Import_Code" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" Loaded="Page_Loaded">
 
-    <Grid x:Name="BaseGrid" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-        
+    <Grid  x:Name="BaseGrid">
+        <DockPanel x:Name="ItemPanel">
+            <DockPanel x:Name="SubPanel" DockPanel.Dock="Top">
+                <Button x:Name="ImportExcel" Content="导入 Excel 文件" VerticalAlignment="Center" HorizontalAlignment="Left" Width="90" Height="20" Click="ImportExcel_Click"></Button>
+                <Grid Width="10"></Grid>
+                <Label x:Name="StatusLabel" Content="共计{0}项"  VerticalAlignment="Center" HorizontalAlignment="Left"></Label>
+                <Grid x:Name="SearchGrid" VerticalAlignment="Top" HorizontalAlignment="Right" Width="200" DockPanel.Dock="Right">
+                    <Button x:Name="ImportBtn" Content="导出 Excel 模板" VerticalAlignment="Center" HorizontalAlignment="Right" Width="90" Height="20" Click="ImportBtn_Click"></Button>
+                </Grid>
+            </DockPanel>
+            <DockPanel x:Name="DataPanel">
+                <Grid x:Name="DataContainer">
+                    <DataGrid x:Name="ItemData" d:ItemsSource="{Binding UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,30" Background="Transparent" HeadersVisibility="Column" FontFamily="Microsoft YaHei" CanUserSortColumns="False" CanUserReorderColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True" Foreground="{DynamicResource FontColorBrush}" CanUserResizeRows="False" EnableRowVirtualization="False" AreRowDetailsFrozen="True" VerticalAlignment="Top" HorizontalAlignment="Left" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="唯一编码" Binding="{Binding UID}" FontFamily="Microsoft YaHei" CanUserResize="True" Width="40"/>
+                            <DataGridTextColumn Header="名称" Binding="{Binding Name}" FontFamily="Microsoft YaHei" CanUserResize="True" Width="40"/>
+                            <DataGridTextColumn Header="型号" Binding="{Binding Model}" FontFamily="Microsoft YaHei" CanUserResize="True" Width="160"/>
+                            <DataGridTextColumn Header="计量单位" Binding="{Binding Unit}" FontFamily="Microsoft YaHei" CanUserResize="True" Width="160"/>
+                            <DataGridTextColumn Header="单价" Binding="{Binding Price}" FontFamily="Microsoft YaHei" CanUserResize="True" Width="160"/>
+                        </DataGrid.Columns>
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="{x:Type DataGridColumnHeader}">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Foreground" Value= "{DynamicResource FontColorBrush}"/>
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+                        <DataGrid.RowStyle>
+                            <Style TargetType="{x:Type DataGridRow}">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Foreground" Value= "{DynamicResource FontColorBrush}"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value= "{DynamicResource BackgroundDimColorBrush}"/>
+                                        <Setter Property="Foreground" Value= "{DynamicResource FontColorBrush}"/>
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value= "{DynamicResource BackgroundDimColorBrush}"/>
+                                        <Setter Property="Foreground" Value= "{DynamicResource AccentColorBrush}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.RowStyle>
+                        <DataGrid.CellStyle>
+                            <Style TargetType="{x:Type DataGridCell}">
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="Transparent"/>
+                                        <Setter Property="BorderBrush" Value="{x:Null}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.CellStyle>
+                    </DataGrid>
+                </Grid>
+            </DockPanel>
+        </DockPanel>
     </Grid>
 </Page>

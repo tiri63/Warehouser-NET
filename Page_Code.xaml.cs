@@ -23,7 +23,8 @@ namespace Warehouser_NET
         internal List<UIDClass> code_all = new List<UIDClass>();
         internal List<UIDClass> code_search = new List<UIDClass>();
         internal int flag = 0;
-        public Page_Code()
+        private FunWindow? parent = null;
+        public Page_Code(FunWindow parent)
         {
             InitializeComponent();
             ItemData.ItemsSource = code_all;
@@ -31,6 +32,7 @@ namespace Warehouser_NET
             {
                 getUIDs();
             }).Start();
+            this.parent = parent;
         }
 
         private bool getUIDs()
@@ -47,7 +49,7 @@ namespace Warehouser_NET
                 {
                     Dispatcher.Invoke(() =>
                     {
-                        code_all.Add(UIDClass.Parse(ja[i].AsObject()));
+                        code_all.Add(UIDClass.Parse(ja[i]));
                     });
                 };
                 return true;
@@ -81,6 +83,15 @@ namespace Warehouser_NET
                     HiroUtils.Notify("物品种类信息 - 库存管理", code_all[ItemData.SelectedIndex].ToString());
                 else
                     HiroUtils.Notify("物品种类信息 - 库存管理", code_search[ItemData.SelectedIndex].ToString());
+            }
+        }
+
+        private void ImportBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if(parent != null)
+            {
+                parent.ico ??= new Import_Code();
+                parent.MainExplorer.Navigate(parent.ico);
             }
         }
     }

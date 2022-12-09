@@ -26,6 +26,7 @@ namespace Warehouser_NET
         internal Page_Usage? pus = null;
         internal Page_Settings? pse = null;
         internal Page_About? pab = null;
+        internal Import_Code? ico = null;
         public FunWindow()
         {
             InitializeComponent();
@@ -80,7 +81,7 @@ namespace Warehouser_NET
 
         private void Label_Code_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            pco ??= new Page_Code();
+            pco ??= new Page_Code(this);
             MainExplorer.Navigate(pco);
         }
 
