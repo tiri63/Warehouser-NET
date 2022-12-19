@@ -17,10 +17,12 @@ namespace Warehouser_NET
     /// </summary>
     public partial class Explorer : Window
     {
-        public Explorer(Page p)
+        internal FunWindow? fw = null;
+        public Explorer(Page p, FunWindow fw)
         {
             InitializeComponent();
             Frame.Navigate(p);
+            this.fw = fw;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -49,15 +51,16 @@ namespace Warehouser_NET
                     psh.isolated = false;
                     break;
                 case Page_Usage pus:
-                    pus.isolated = true;
+                    pus.isolated = false;
                     break;
                 case Page_Member pme:
-                    pme.isolated = true;
+                    pme.isolated = false;
                     break;
                 default:
                     break;
-
             }
+            if (fw != null)
+                fw.MainExplorer.Navigate(Frame.Content);
         }
     }
 }

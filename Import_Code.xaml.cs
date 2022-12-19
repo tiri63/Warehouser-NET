@@ -1,8 +1,10 @@
 ﻿using Microsoft.Win32;
+using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System;
 using System.IO;
+using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -195,12 +197,42 @@ namespace Warehouser_NET
 
         private void ImportClipboard_Click(object sender, RoutedEventArgs e)
         {
-            string txt = string.Empty;
-            foreach(var f in Clipboard.GetData(DataFormats.Text).ToString().Split("\t"))
+            ImportClipboard.IsEnabled = false;
+            new System.Threading.Thread(() =>
             {
-                txt = txt + "|" + f;
+                ImportFromClipboard();
+            }).Start();
+        }
+
+        private void ImportFromClipboard()
+        {
+            string data = string.Empty;
+            Dispatcher.Invoke(() =>
+            {
+                data = Clipboard.GetData(DataFormats.Text).ToString();
+            });
+            foreach (var item in data.Split(Environment.NewLine))
+            {
+                var isp = item.Split("\t");
+                if (isp.Length >= 5)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        iuids.Add(new UIDClass()
+                        {
+                            UID = isp[0],
+                            Name = isp[1],
+                            Model = isp[2],
+                            Unit = isp[3],
+                            Price = isp[4]
+                        });
+                    });
+                }
             }
-            HiroUtils.Notify("1", txt);
+            Dispatcher.Invoke(() =>
+            {
+                ImportClipboard.IsEnabled = true;
+            });
         }
     }
 }

@@ -30,5 +30,13 @@
                 <Frame x:Name="MainExplorer" NavigationUIVisibility="Hidden"></Frame>
             </DockPanel>
         </DockPanel>
+        <Grid x:Name="NotificationBaseGrid" VerticalAlignment="Top" HorizontalAlignment="Left" Visibility="Hidden">
+            <Label x:Name="NotificationBackground" Background="{DynamicResource BackgroundColorBrush}" BorderBrush="{DynamicResource FontColorBrush}" BorderThickness="2"></Label>
+            <DockPanel x:Name="Notification" Margin="8">
+                <Label x:Name="NotificationTitle" DockPanel.Dock="Top"  FontFamily="Microsoft YaHei" Content="通知标题" FontWeight="Bold" FontSize="16" Foreground="{DynamicResource FontColorBrush}"></Label>
+                <Label x:Name="NotificationContent" DockPanel.Dock="Bottom"  FontFamily="Microsoft YaHei" Content="通知内容\n啊啊啊啊\n测试测试" FontSize="14" Foreground="{DynamicResource FontColorBrush}" ></Label>
+        </DockPanel>
+        </Grid>
+        
     </Grid>
 </Window>

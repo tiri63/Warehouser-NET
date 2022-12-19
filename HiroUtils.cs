@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Policy;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Windows;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
@@ -29,6 +30,66 @@ public class HiroUtils
     public HiroUtils()
     {
 
+    }
+
+    internal static JsonNode? ParseJson(string json)
+    {
+        JsonNode? ret = null;
+        try
+        {
+            ret = JsonNode.Parse(json);
+            string retCode = ret["ret"].AsObject().ToString();
+            switch (retCode)
+            {
+                case "0":
+                    return ret;
+                case "ec-001":
+                    Notify("提供的参数不足", "通信错误");
+                    break;
+                case "ec-002":
+                    Notify("未定义的操作", "服务器错误");
+                    break;
+                case "ec-003":
+                    Notify("账户不支持这样的操作", "权限不足");
+                    break;
+                case "ec-004":
+                    Notify("提供的参数有空", "通信错误");
+                    break;
+                case "ec-005":
+                    Notify("提供的参数无法完成类型转换", "通信错误");
+                    break;
+                case "ec-006":
+                    Notify("未能在数据库中找到指定内容", "数据库错误");
+                    break;
+                case "ec-007":
+                    Notify("进行数据库操作时出错", "数据库错误");
+                    break;
+                case "ec-008":
+                    Notify("指定的项目未找到", "同步错误");
+                    break;
+                case "ec-009":
+                    Notify("库存已经耗尽，无法进行此操作", "同步错误");
+                    break;
+                case "ec-010":
+                    Notify("生成输出时出错", "服务器错误");
+                    break;
+                case "ec-011":
+                    Notify("身份验证失败", "凭据失效");
+                    break;
+                case "ec-012":
+                    Notify("账户密码和 ID 不匹配", "登陆失败");
+                    break;
+                default:
+                    Notify(ret["msg"].AsObject().ToString(), "服务器消息");
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            Notify("Json 解析失败", "通信错误");
+            return null;
+        }
+        return ret;
     }
 
     internal static string SendRequest(string uri, List<string> param, List<string> value)
@@ -88,7 +149,29 @@ public class HiroUtils
     {
         Dispatcher.CurrentDispatcher.Invoke(() =>
         {
-            new Dialog(title, content).Show();
+            if (App.funWindow != null)
+                App.funWindow.Notify(content, title);
+            else
+            {
+                if (title == "")
+                {
+                    MessageBox.Show(content, "信息 - 库存管理");
+                }
+                else
+                {
+                    MessageBox.Show(content, title);
+                }
+            }
+        });
+    }
+    internal static void Notify(string content)
+    {
+        Dispatcher.CurrentDispatcher.Invoke(() =>
+        {
+            if (App.funWindow != null)
+                App.funWindow.Notify(content, "");
+            else
+                MessageBox.Show(content, "信息 - 库存管理");
         });
     }
 
@@ -196,7 +279,7 @@ public class HiroUtils
             str.Append($"Details: {ex.InnerException.Message}");
             str.Append($"StackTrace: {ex.InnerException.StackTrace}");
         }
-        MessageBox.Show(str.ToString(), "错误 - Warehouser");
+        Notify($"错误位置 : {Module}{Environment.NewLine}具体信息请查看日志", "发生错误");
         LogtoFile(str.ToString());
     }
 
@@ -204,7 +287,7 @@ public class HiroUtils
     {
         try
         {
-            var filePath = Path_Prepare(LogFilePath) + DateTime.Now.ToString("yyyy-MM-dd")+".log";
+            var filePath = Path_Prepare(LogFilePath) + DateTime.Now.ToString("yyyy-MM-dd") + ".log";
             if (!File.Exists(filePath))
                 File.Create(filePath).Close();
             FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite);

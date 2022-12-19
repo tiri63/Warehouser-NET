@@ -95,5 +95,43 @@ namespace Warehouser_NET
                 parent.MainExplorer.Navigate(parent.ico);
             }
         }
+
+        private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (Height > 60)
+                sv.MaxHeight = Height - 60;
+        }
+
+        private void ShowMsg(string title, string? content, bool progress = false,bool button = false)
+        {
+            MsgProgressBar.Visibility = progress ? Visibility.Visible : Visibility.Collapsed;
+            MsgOKButton.Visibility = button ? Visibility.Visible : Visibility.Collapsed;
+            MsgGrid.Visibility = Visibility.Visible;
+            MsgContent.Visibility = content == null ? Visibility.Collapsed : Visibility.Visible;
+            MsgTitle.Content = title;
+            if (content != null)
+                MsgContent.Content = content;
+            HiroUtils.AddPowerAnimation(1, MsgGrid, null, 50).Begin();
+        }
+
+        private void HideMsg()
+        {
+            var sb = HiroUtils.AddDoubleAnimaton(0, 150, MsgGrid, "Opacity", null);
+            sb.Completed += delegate
+            {
+                MsgGrid.Visibility = Visibility.Collapsed;
+            };
+            sb.Begin();
+        }
+
+        private void StatusLabel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            ShowMsg("测试", "这是一个测试消息，正在加载……", true);
+        }
+
+        private void MsgTitle_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            HideMsg();
+        }
     }
 }

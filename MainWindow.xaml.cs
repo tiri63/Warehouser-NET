@@ -20,7 +20,8 @@ namespace Warehouser_NET
                 {
                     Dispatcher.BeginInvoke(new Action(() =>
                     {
-                        new FunWindow().Show();
+                        App.funWindow = new FunWindow();
+                        App.funWindow.Show();
                     }));
                     return;
                     HiroUtils.InitializeConfig();
@@ -61,11 +62,12 @@ namespace Warehouser_NET
                         }
                         else
                         {
-                            new FunWindow().Show();
+                            App.funWindow = new FunWindow();
+                            App.funWindow.Show();
                             Close();
                         }
                     });
-                    
+
 
                 }
                 catch (Exception ex)

@@ -13,5 +13,10 @@ namespace Warehouser_NET
     /// </summary>
     public partial class App : Application
     {
+        internal static FunWindow? funWindow = null;
+        private void Hiro_We_Go(object sender, StartupEventArgs e)
+        {
+            new MainWindow().Show();
+        }
     }
 }

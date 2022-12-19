@@ -6,13 +6,13 @@
       xmlns:local="clr-namespace:Warehouser_NET"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="Page_Code" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" Loaded="Page_Loaded">
+      Title="Page_Code" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" Loaded="Page_Loaded" SizeChanged="Page_SizeChanged">
 
     <Grid  x:Name="BaseGrid">
-        <DockPanel x:Name="ItemPanel">
+        <DockPanel x:Name="ItemPanel" Visibility="Visible">
             <DockPanel x:Name="SubPanel" DockPanel.Dock="Top">
                 <Button x:Name="ImportBtn" Content="新增/导入" VerticalAlignment="Center" HorizontalAlignment="Left" Width="90" Height="20" Click="ImportBtn_Click"></Button>
-                <Label x:Name="StatusLabel" Content="共计{0}项"  VerticalAlignment="Center" HorizontalAlignment="Left"></Label>
+                <Label x:Name="StatusLabel" Content="共计{0}项"  VerticalAlignment="Center" HorizontalAlignment="Left" MouseLeftButtonDown="StatusLabel_MouseLeftButtonDown"></Label>
                 <Grid x:Name="SearchGrid" VerticalAlignment="Top" HorizontalAlignment="Right" Width="200" DockPanel.Dock="Right">
                     <Label x:Name="SearchTextLabel" Width="200" Content="按回车键搜索" FontStyle="Italic" Margin="{Binding Margin, ElementName=SearchTextBox}" HorizontalAlignment="{Binding HorizontalAlignment, ElementName=SearchTextBox}" VerticalAlignment="{Binding VerticalAlignment, ElementName=SearchTextBox}" VerticalContentAlignment="Center"/>
                     <TextBox x:Name="SearchTextBox" Background="Transparent"  VerticalContentAlignment="Center" BorderBrush="{DynamicResource FontColorBrush}" TextChanged="SearchTextBox_TextChanged"></TextBox>
@@ -69,5 +69,17 @@
                 </Grid>
             </DockPanel>
         </DockPanel>
+        <Grid x:Name="MsgGrid" Visibility="Collapsed">
+            <Label x:Name="MsgBackground" Background="{DynamicResource BackgroundColorBrush}" Opacity="0.8"></Label>
+            <Label x:Name="DockPanelBackground" BorderBrush="{DynamicResource FontColorBrush}" BorderThickness="2" Background="{DynamicResource BackgroundColorBrush}" Opacity="0.8" HorizontalAlignment="Center" VerticalAlignment="Center" Width="{Binding ActualWidth, ElementName=MsgCenterGrid, Mode=OneWay}" Height="{Binding ActualHeight, ElementName=MsgCenterGrid, Mode=OneWay}"></Label>
+            <DockPanel x:Name="MsgCenterGrid" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Label x:Name="MsgTitle" DockPanel.Dock="Top" Content="收到一条新消息" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Margin="20,20,0,10" MouseDoubleClick="MsgTitle_MouseDoubleClick" />
+                <Label x:Name="MsgContent" DockPanel.Dock="Top" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="40,10,30,10" >
+                    <ScrollViewer x:Name="sv" Content="收到新消息，请双击查看" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"/>
+                </Label>
+                <ProgressBar x:Name="MsgProgressBar"  IsIndeterminate="True" DockPanel.Dock="Top" Height="15" Margin="20,10,20,20"></ProgressBar>
+                <Button x:Name="MsgOKButton" Content="OK" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" Margin="5,10,20,20" HorizontalAlignment="Right" VerticalAlignment="Top" Width="50" Height="20"/>
+            </DockPanel>
+        </Grid>
     </Grid>
 </Page>
