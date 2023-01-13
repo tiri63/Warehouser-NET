@@ -8,11 +8,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties;
 
 namespace Warehouser_NET
 {
@@ -21,7 +16,6 @@ namespace Warehouser_NET
     /// </summary>
     public partial class Page_Depart : Page
     {
-        internal System.Collections.ObjectModel.ObservableCollection<DepartClass> depart_all = new System.Collections.ObjectModel.ObservableCollection<DepartClass>();
         internal System.Collections.ObjectModel.ObservableCollection<DepartClass> depart_search = new System.Collections.ObjectModel.ObservableCollection<DepartClass>();
         internal int flag = 0;
         internal bool isolated = false;
@@ -29,7 +23,7 @@ namespace Warehouser_NET
         public Page_Depart(FunWindow parent)
         {
             InitializeComponent();
-            ItemData.ItemsSource = depart_all;
+            ItemData.ItemsSource = HiroUtils.depart_all;
             new Thread(() =>
             {
                 getDeparts();
@@ -41,21 +35,25 @@ namespace Warehouser_NET
         {
             try
             {
-                var jo = JsonObject.Parse(HiroUtils.SendRequest("/depart", new List<string>() { "action" }, new List<string>() { "2" }));
-                var ja = jo["msg"].AsArray();
-                Dispatcher.Invoke(() =>
+                var jo = HiroUtils.ParseJson(HiroUtils.SendRequest("/depart", new List<string>() { "action" }, new List<string>() { "2" }));
+                if (jo != null)
                 {
-                    StatusLabel.Content = string.Format("共计{0}项", ja.Count);
-                });
-                for (int i = 0; i < ja.Count; i++)
-                {
+                    var ja = jo["msg"].AsArray();
                     Dispatcher.Invoke(() =>
                     {
-                        depart_all.Add(DepartClass.Parse(ja[i]));
+                        StatusLabel.Content = string.Format("共计{0}项", ja.Count);
                     });
+                    for (int i = 0; i < ja.Count; i++)
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            HiroUtils.depart_all.Add(DepartClass.Parse(ja[i]));
+                        });
 
-                };
-                return true;
+                    };
+                    return true;
+                }
+                return false;
             }
             catch (Exception ex)
             {
@@ -75,7 +73,7 @@ namespace Warehouser_NET
             if (ItemData.SelectedIndex != -1)
             {
                 if (flag == 0)
-                    HiroUtils.Notify("部门信息 - 库存管理", depart_all[ItemData.SelectedIndex].ToIDString());
+                    HiroUtils.Notify("部门信息 - 库存管理", HiroUtils.depart_all[ItemData.SelectedIndex].ToIDString());
                 else
                     HiroUtils.Notify("部门信息 - 库存管理", depart_search[ItemData.SelectedIndex].ToIDString());
             }

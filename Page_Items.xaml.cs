@@ -40,21 +40,25 @@ namespace Warehouser_NET
         {
             try
             {
-                var jo = JsonObject.Parse(HiroUtils.SendRequest("/all", new List<string>() { "action" }, new List<string>() { "1" }));
-                var ja = jo["msg"].AsArray();
-                Dispatcher.Invoke(() =>
+                var jo = HiroUtils.ParseJson(HiroUtils.SendRequest("/all", new List<string>() { "action" }, new List<string>() { "1" }));
+                if(jo != null)
                 {
-                    StatusLabel.Content = string.Format("共计{0}项", ja.Count);
-                });
-                for (int i = 0; i < ja.Count; i++)
-                {
+                    var ja = jo["msg"].AsArray();
                     Dispatcher.Invoke(() =>
                     {
-                        item_all.Add(ItemClass.Parse(ja[i]));
+                        StatusLabel.Content = string.Format("共计{0}项", ja.Count);
                     });
-                    
-                };
-                return true;
+                    for (int i = 0; i < ja.Count; i++)
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            item_all.Add(ItemClass.Parse(ja[i]));
+                        });
+
+                    };
+                    return true;
+                }
+                return false;
             }
             catch(Exception ex)
             {

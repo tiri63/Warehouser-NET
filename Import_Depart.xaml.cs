@@ -20,6 +20,8 @@ namespace Warehouser_NET
     /// </summary>
     public partial class Import_Depart : Page
     {
+        internal bool isolated = false;
+        private FunWindow? parent = null;
         public Import_Depart()
         {
             InitializeComponent();

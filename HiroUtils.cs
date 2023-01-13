@@ -21,12 +21,14 @@ public class HiroUtils
     internal static string? userToken = null;
     internal static string? userDepart = null;
     internal static string? userNickname = null;
-    internal const string baseURL = "http://10.3.201.64/warehouser";
+    //internal const string baseURL = "http://10.3.201.64/warehouser";
+    internal const string baseURL = "http://101.34.8.69/warehouser";
     internal static HttpClient? hc = null;
     internal static string LogFilePath = "<current>\\users\\<hiuser>\\log\\";
     internal static string ConfigFilePath = "<current>\\users\\<hiuser>\\user.hsf";
     internal static System.Collections.ObjectModel.ObservableCollection<UsageClass> usages = new System.Collections.ObjectModel.ObservableCollection<UsageClass>();
-    internal static List<string> roles = new List<string>() { "游客", "用户", "管理员" };
+    internal static System.Collections.ObjectModel.ObservableCollection<DepartClass> depart_all = new System.Collections.ObjectModel.ObservableCollection<DepartClass>();
+    internal static List<string> roles = new List<string>() { "游客", "用户", "管理员", "超级管理员" };
     public HiroUtils()
     {
 
@@ -34,11 +36,12 @@ public class HiroUtils
 
     internal static JsonNode? ParseJson(string json)
     {
+        LogtoFile(json);
         JsonNode? ret = null;
         try
         {
-            ret = JsonNode.Parse(json);
-            string retCode = ret["ret"].AsObject().ToString();
+            ret = JsonObject.Parse(json);
+            string retCode = ret["ret"].AsValue().ToString();
             switch (retCode)
             {
                 case "0":
@@ -79,6 +82,12 @@ public class HiroUtils
                 case "ec-012":
                     Notify("账户密码和 ID 不匹配", "登陆失败");
                     break;
+                case "ec-013":
+                    Notify("操作未能成功进行", "操作失败");
+                    break;
+                case "ec-014":
+                    Notify("部分操作未能成功进行", "操作失败");
+                    break;
                 default:
                     Notify(ret["msg"].AsObject().ToString(), "服务器消息");
                     break;
@@ -103,7 +112,7 @@ public class HiroUtils
         int num = Math.Max(param.Count, value.Count);
         for (int i = 0; i < num; i++)
         {
-            request.Headers.Add(param[i], value[i]);
+            request.Headers.Add(param[i], value[i].Replace(Environment.NewLine, " "));
         }
         //这里设置协议
         ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072;// SecurityProtocolType.Tls1.2; 
@@ -138,6 +147,8 @@ public class HiroUtils
 
     internal static void InitializeConfig()
     {
+        LogFilePath = Path_Prepare(LogFilePath);
+        ConfigFilePath = Path_Prepare(ConfigFilePath);
         CreateFolder(Path_Prepare(LogFilePath));
         CreateFolder(Path_Prepare(ConfigFilePath));
         userName = Read_Ini(ConfigFilePath, "User", "UserName", " ");
@@ -145,7 +156,7 @@ public class HiroUtils
         userDepart = Read_Ini(ConfigFilePath, "User", "UserDepart", " ");
         userNickname = Read_Ini(ConfigFilePath, "User", "NickName", " ");
     }
-    internal static void Notify(string title, string content)
+    internal static void Notify(string content, string title)
     {
         Dispatcher.CurrentDispatcher.Invoke(() =>
         {
@@ -563,4 +574,95 @@ public class HiroUtils
     }
     #endregion
 
+    /// <summary>
+    /// 对字符进行UrlEncode编码
+    /// string转Encoding格式
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="encod">编码格式</param>
+    /// <param name="cap">是否输出大写字母</param>
+    /// <returns></returns>
+    public static string UrlEncode(string text, Encoding encod, bool cap = true)
+    {
+        if (cap)
+        {
+            StringBuilder builder = new StringBuilder();
+            foreach (char c in text)
+            {
+                if (System.Web.HttpUtility.UrlEncode(c.ToString(), encod).Length > 1)
+                {
+                    builder.Append(System.Web.HttpUtility.UrlEncode(c.ToString(), encod).ToUpper());
+                }
+                else
+                {
+                    builder.Append(c);
+                }
+            }
+            return builder.ToString();
+        }
+        else
+        {
+            string encodString = System.Web.HttpUtility.UrlEncode(text, encod);
+            return encodString;
+        }
+    }
+
+    /// <summary>
+    /// 对字符进行UrlDecode解码
+    /// Encoding转string格式
+    /// </summary>
+    /// <param name="encodString"></param>
+    /// <param name="encod">编码格式</param>
+    /// <returns></returns>
+    public static string UrlDecode(string encodString, Encoding encod)
+    {
+        string text = System.Web.HttpUtility.UrlDecode(encodString, encod);
+        return text;
+    }
+    public static int GetPage(int num)
+    {
+        if (num % 20 == 0)
+            return num / 20;
+        else
+            return num / 20 + 1;
+    }
+
+    public static bool getDeparts()
+    {
+        HiroInvoke(() =>
+        {
+            depart_all.Clear();
+        });
+        try
+        {
+            var jo = ParseJson(SendRequest("/depart", new List<string>() { "action" }, new List<string>() { "2" }));
+            if (jo != null)
+            {
+                var ja = jo["msg"].AsArray();
+                for (int i = 0; i < ja.Count; i++)
+                {
+                    HiroInvoke(() =>
+                    {
+                        depart_all.Add(DepartClass.Parse(ja[i]));
+                    });
+
+                };
+                return true;
+            }
+            return false;
+        }
+        catch (Exception ex)
+        {
+            HiroInvoke(() =>
+            {
+                LogError(ex, "Exception.Depart.Get");
+            });
+            return false;
+        }
+    }
+
+    internal static void HiroInvoke(Action callback)
+    {
+        Application.Current.Dispatcher.Invoke(callback);
+    }
 }

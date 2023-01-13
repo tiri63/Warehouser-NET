@@ -18,52 +18,59 @@ namespace Warehouser_NET
             {
                 try
                 {
-                    Dispatcher.BeginInvoke(new Action(() =>
-                    {
-                        App.funWindow = new FunWindow();
-                        App.funWindow.Show();
-                    }));
-                    return;
                     HiroUtils.InitializeConfig();
                     HiroUtils.usages.Clear();
-                    JsonNode jn = JsonObject.Parse(HiroUtils.SendRequest("/usage", new List<string>() { "action" }, new List<string>() { "2" }));
-                    JsonArray ja = jn["msg"].AsArray();
-                    foreach (var jo in ja)
+                    var jn = HiroUtils.ParseJson(HiroUtils.SendRequest("/usage", new List<string>() { "action" }, new List<string>() { "2" }));
+                    if (jn != null)
                     {
-                        string? info = null;
-                        try
+                        JsonArray ja = jn["msg"].AsArray();
+                        foreach (var jo in ja)
                         {
-                            info = jo["info"].ToString();
-                        }
-                        catch
-                        {
+                            string? info = null;
+                            try
+                            {
+                                info = jo["info"].ToString();
+                            }
+                            catch
+                            {
 
+                            }
+                            Thread.Sleep(100);
+                            HiroUtils.usages.Add(new UsageClass()
+                            {
+                                Code = int.Parse(jo["id"].ToString()),
+                                Alias = jo["name"].ToString(),
+                                Info = info,
+                                Hide = jo["hide"].ToString().ToLower().Equals("true") || jo["hide"].ToString().Equals("1"),
+                                HideStr = jo["hide"].ToString().ToLower().Equals("true") || jo["hide"].ToString().Equals("1") ? "隐藏" : "可见"
+                            });
                         }
-                        Thread.Sleep(100);
-                        HiroUtils.usages.Add(new UsageClass()
-                        {
-                            Code = int.Parse(jo["id"].ToString()),
-                            Alias = jo["name"].ToString(),
-                            Info = info,
-                            Hide = jo["hide"].ToString().ToLower().Equals("true") || jo["hide"].ToString().Equals("1"),
-                            HideStr = jo["hide"].ToString().ToLower().Equals("true") || jo["hide"].ToString().Equals("1") ? "隐藏" : "可见"
-                        });
+                        Thread.Sleep(1000);
                     }
-                    Thread.Sleep(1000);
+                    else
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            Close();
+                        });
+                        return;
+                    }
 
-                    JsonNode jn2 = JsonObject.Parse(HiroUtils.SendRequest("/user", new List<string>() { "action", "username", "token", "device" },
+
+                    var jn2 = HiroUtils.ParseJson(HiroUtils.SendRequest("/user", new List<string>() { "action", "username", "token", "device" },
                         new List<string>() { "0", HiroUtils.userName, HiroUtils.userToken, "PC" }));
                     Dispatcher.Invoke(() =>
                     {
-                        if (jn2["ret"].ToString() != "0")
-                        {
-                            new Login().Show();
-                            Close();
-                        }
-                        else
+                        if (jn2 != null)
                         {
                             App.funWindow = new FunWindow();
                             App.funWindow.Show();
+                            Close();
+
+                        }
+                        else
+                        {
+                            new Login().Show();
                             Close();
                         }
                     });

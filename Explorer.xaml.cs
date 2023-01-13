@@ -56,6 +56,24 @@ namespace Warehouser_NET
                 case Page_Member pme:
                     pme.isolated = false;
                     break;
+                case Import_Code ic:
+                    ic.isolated = false;
+                    break;
+                case Import_Depart id:
+                    id.isolated = false;
+                    break;
+                case Import_Items ii:
+                    ii.isolated = false;
+                    break;
+                case Import_Shelf ish:
+                    ish.isolated = false;
+                    break;
+                case Import_Usage ius:
+                    ius.isolated = false;
+                    break;
+                case Import_User iur:
+                    iur.isolated = false;
+                    break;
                 default:
                     break;
             }

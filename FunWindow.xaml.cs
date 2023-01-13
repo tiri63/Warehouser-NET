@@ -42,45 +42,47 @@ namespace Warehouser_NET
         internal void Notify(string content, string title = "")
         {
             title = title.Equals("") ? "通知" : title;
-            NotificationTitle.Content = title;
-            NotificationContent.Content = content;
-            if (Notification_CD > 0)
+            Dispatcher.Invoke(() =>
             {
-                Notification_CD = 5;
-            }
-            else
-            {
-                NotificationBaseGrid.Visibility = Visibility.Visible;
-                var sb = HiroUtils.AddPowerAnimation(0, NotificationBaseGrid, null, -NotificationBaseGrid.ActualWidth);
-                sb.Completed += delegate
+                NotificationTitle.Content = title;
+                NotificationContent.Content = content;
+                if (Notification_CD > 0)
                 {
                     Notification_CD = 5;
-                    new Thread(() =>
+                }
+                else
+                {
+                    NotificationBaseGrid.Visibility = Visibility.Visible;
+                    var sb = HiroUtils.AddPowerAnimation(0, NotificationBaseGrid, null, -NotificationBaseGrid.ActualWidth);
+                    sb.Completed += delegate
                     {
-                        while (Notification_CD > 0)
+                        Notification_CD = 5;
+                        new Thread(() =>
                         {
-                            Notification_CD--;
-                            Thread.Sleep(1000);
-                        }
-                        Dispatcher.Invoke(() =>
-                        {
-                            var sb2 = HiroUtils.AddPowerAnimation(0, NotificationBaseGrid, null, null, -NotificationBaseGrid.ActualWidth);
-                            sb2.Completed += delegate
+                            while (Notification_CD > 0)
                             {
-                                NotificationBaseGrid.Visibility = Visibility.Hidden;
-                                Canvas.SetLeft(NotificationBaseGrid, -NotificationBaseGrid.ActualWidth);
-                            };
-                            sb2.Begin();
-                        });
-                    }).Start();
-                };
-                sb.Begin();
-            }
+                                Notification_CD--;
+                                Thread.Sleep(1000);
+                            }
+                            Dispatcher.Invoke(() =>
+                            {
+                                var sb2 = HiroUtils.AddPowerAnimation(0, NotificationBaseGrid, null, null, -NotificationBaseGrid.ActualWidth);
+                                sb2.Completed += delegate
+                                {
+                                    NotificationBaseGrid.Visibility = Visibility.Hidden;
+                                    Canvas.SetLeft(NotificationBaseGrid, -NotificationBaseGrid.ActualWidth);
+                                };
+                                sb2.Begin();
+                            });
+                        }).Start();
+                    };
+                    sb.Begin();
+                }
+            });
         }
 
         private void LogOut_Click(object sender, RoutedEventArgs e)
         {
-
             new Login().Show();
             Close();
         }

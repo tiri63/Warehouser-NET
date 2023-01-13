@@ -31,11 +31,12 @@ namespace Warehouser_NET
                         userName = UserName.Text;
                         userPwd = UserPwd.Password;
                     });
-                    JsonNode jn = JsonObject.Parse(HiroUtils.SendRequest("/user", new List<string>() { "action", "username", "password", "device" },
+                    var jn = HiroUtils.ParseJson(HiroUtils.SendRequest("/user", new List<string>() { "action", "username", "password", "device" },
                         new List<string>() { "1", userName, userPwd, "PC" }));
+
                     Dispatcher.Invoke(() =>
                     {
-                        if (jn["ret"].ToString() == "0")
+                        if (jn != null)
                         {
                             HiroUtils.userName = userName;
                             HiroUtils.userDepart = jn["depart"]["name"].ToString();
@@ -48,19 +49,15 @@ namespace Warehouser_NET
                             new FunWindow().Show();
                             Close();
                         }
-                        else
-                        {
-                            HiroUtils.Notify("登录失败", $"登录失败，信息为：\r\n{jn["msg"]}");
-                        }
                         LoginBtn.IsEnabled = true;
                     });
-                    
+
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     HiroUtils.LogError(ex, "Exception.Login");
                 }
-                
+
             }).Start();
         }
 

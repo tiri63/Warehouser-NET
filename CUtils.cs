@@ -468,14 +468,29 @@ namespace Warehouser_NET
 
         public static UIDClass Parse(JsonNode json)
         {
-            return new UIDClass()
+            try
             {
-                UID = json["uid"].ToString(),
-                Name = json["name"].ToString(),
-                Model = json["model"].ToString(),
-                Unit = json["unit"].ToString(),
-                Price = json["price"].ToString()
-            };
+                return new UIDClass()
+                {
+                    UID = json["uid"].ToString(),
+                    Name = json["name"].ToString(),
+                    Model = json["model"].ToString(),
+                    Unit = json["unit"].ToString(),
+                    Price = json["price"].ToString()
+                };
+            }
+            catch(Exception ex)
+            {
+                return new UIDClass()
+                {
+                    UID = "出错",
+                    Name = "出错",
+                    Model = "出错",
+                    Unit = "出错",
+                    Price = "出错"
+                };
+            }
+            
         }
 
         public string UID
@@ -531,6 +546,16 @@ namespace Warehouser_NET
                 $"型号 : \t\t{Model}{Environment.NewLine}" +
                 $"计量单位 : \t{Unit}{Environment.NewLine}" +
                 $"单价 : (RMB)\t{Price}{Environment.NewLine}";
+        }
+        public JsonNode toJson()
+        {
+            var ret = new JsonObject();
+            ret.Add("uid", UID);
+            ret.Add("name", Name);
+            ret.Add("model", Model);
+            ret.Add("unit", Unit);
+            ret.Add("price", Price);
+            return ret;
         }
     }
 

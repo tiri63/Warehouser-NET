@@ -3,10 +3,14 @@ using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System;
+using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Security.Cryptography;
+using System.Text.Json.Nodes;
 using System.Windows;
 using System.Windows.Controls;
+using static ICSharpCode.SharpZipLib.Zip.ExtendedUnixData;
 
 namespace Warehouser_NET
 {
@@ -16,10 +20,16 @@ namespace Warehouser_NET
     public partial class Import_Code : Page
     {
         internal System.Collections.ObjectModel.ObservableCollection<UIDClass> iuids = new System.Collections.ObjectModel.ObservableCollection<UIDClass>();
+        internal System.Collections.ObjectModel.ObservableCollection<UIDClass> iuidsp = new System.Collections.ObjectModel.ObservableCollection<UIDClass>();
+        internal bool isolated = false;
+        private FunWindow? parent = null;
+        internal int page = 0;
+        internal int index = 0;
+        internal int fflag = 0;
         public Import_Code()
         {
             InitializeComponent();
-            ItemData.ItemsSource = iuids;
+            ItemData.ItemsSource = iuidsp;
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -100,6 +110,10 @@ namespace Warehouser_NET
                         });
 
                     }
+                    Dispatcher.Invoke(() =>
+                    {
+                        Load_Part();
+                    });
                     return true;
                 }
                 else
@@ -162,7 +176,7 @@ namespace Warehouser_NET
         {
             SaveFileDialog ofd = new SaveFileDialog()
             {
-                Filter = "Xlsx 文件|*.xlsx",
+                Filter = "Excel 2007+ 格式|*.xlsx",
                 ValidateNames = true, // 验证用户输入是否是一个有效的Windows文件名
                 CheckPathExists = true,//验证路径的有效性
                 Title = "保存文件 - 库存管理"
@@ -232,7 +246,227 @@ namespace Warehouser_NET
             Dispatcher.Invoke(() =>
             {
                 ImportClipboard.IsEnabled = true;
+                Load_Part();
             });
+        }
+
+        private void OKBtn_Click(object sender, RoutedEventArgs e)
+        {
+
+            if (iuids.Count > 0)
+                ShowMsg("正在导入", "正在将数据上传到服务器……", true);
+            //分段导入
+            if (iuids.Count > 20)
+            {
+                new System.Threading.Thread(() =>
+                {
+                    for (var i = 0; i * 20 < iuids.Count; i++)
+                    {
+                        var ja = new JsonArray();
+                        for (var j = 0; j < 20; j++)
+                        {
+                            if (i * 20 + j >= iuids.Count)
+                                break;
+                            ja.Add(iuids[i * 20 + j].toJson());
+                            var jo = HiroUtils.ParseJson(HiroUtils.SendRequest("/uid", new List<string>() { "action", "username", "token", "device", "uids" },
+                            new List<string>() { "4", HiroUtils.userName, HiroUtils.userToken, "PC", ja.ToString().Replace(Environment.NewLine, " ") }));
+                            if (jo != null)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                Dispatcher.Invoke(() =>
+                                {
+                                    HideMsg();
+                                    HiroUtils.Notify($"导入数据时出错，出错的内容位于{i * 20} - {i + 1 * 20}项数据之间", "导入出错");
+                                });
+                                break;
+                            }
+                        }
+                    }
+                    Dispatcher.Invoke(() =>
+                    {
+                        HiroUtils.Notify("上传成功！");
+                    });
+                }).Start();
+
+            }
+            else
+            {
+                new System.Threading.Thread(() =>
+                {
+                    //生成json数据
+                    var ja = new JsonArray();
+                    foreach (var i in iuids)
+                    {
+                        ja.Add(i.toJson());
+                    };
+                    var jo = HiroUtils.ParseJson(HiroUtils.SendRequest("/uid", new List<string>() { "action", "username", "token", "device", "uids", "uid" },
+                            new List<string>() { "4", HiroUtils.userName, HiroUtils.userToken, "PC", ja.ToString(), ja[0].ToString() }));
+                    Dispatcher.Invoke(() =>
+                    {
+                        if (jo != null)
+                        {
+                            HideMsg();
+                            HiroUtils.Notify("上传成功！");
+                            iuids.Clear();
+                            iuidsp.Clear();
+                        }
+                        else
+                        {
+                            HideMsg();
+                        }
+                    });
+
+                }).Start();
+            }
+        }
+
+
+        private void ItemData_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (ItemData.SelectedIndex != -1)
+            {
+                index = ItemData.SelectedIndex;
+                ShowDetail(ItemData.SelectedIndex);
+            }
+        }
+
+        private void ShowDetail(int index)
+        {
+            fflag = 0;
+            var target = iuids[index];
+            UIDText.Text = target.UID;
+            NameText.Text = target.Name;
+            ModelText.Text = target.Model;
+            UnitText.Text = target.Unit;
+            PriceText.Text = target.Price;
+            DetailGrid.Visibility = Visibility.Visible;
+            ItemPanel.IsEnabled = false;
+            HiroUtils.AddPowerAnimation(1, DetailGrid, null, 50).Begin();
+        }
+
+        private void HideDetail()
+        {
+            var sb = HiroUtils.AddDoubleAnimaton(0, 150, DetailGrid, "Opacity", null);
+            sb.Completed += delegate
+            {
+                DetailGrid.Visibility = Visibility.Collapsed;
+                ItemPanel.IsEnabled = true;
+            };
+            sb.Begin();
+        }
+        private void OKBtn1_Click(object sender, RoutedEventArgs e)
+        {
+            if (fflag == 0)
+                iuids[page * 20 + index] = new UIDClass
+                {
+                    UID = UIDText.Text,
+                    Name = NameText.Text,
+                    Model = ModelText.Text,
+                    Unit = UnitText.Text,
+                    Price = PriceText.Text
+                };
+            else
+                iuids.Add(new UIDClass
+                {
+                    UID = UIDText.Text,
+                    Name = NameText.Text,
+                    Model = ModelText.Text,
+                    Unit = UnitText.Text,
+                    Price = PriceText.Text
+                });
+            HideDetail();
+            Load_Part();
+        }
+
+        private void CancelBtn_Click(object sender, RoutedEventArgs e)
+        {
+            HideDetail();
+        }
+
+        private void ShowMsg(string title, string? content, bool progress = false, bool button = false)
+        {
+            MsgProgressBar.Visibility = progress ? Visibility.Visible : Visibility.Collapsed;
+            MsgOKButton.Visibility = button ? Visibility.Visible : Visibility.Collapsed;
+            MsgGrid.Visibility = Visibility.Visible;
+            MsgContent.Visibility = content == null ? Visibility.Collapsed : Visibility.Visible;
+            ItemPanel.IsEnabled = false;
+            MsgTitle.Content = title;
+            if (content != null)
+                MsgContent.Content = content;
+            HiroUtils.AddPowerAnimation(1, MsgGrid, null, 50).Begin();
+        }
+
+        private void HideMsg()
+        {
+            var sb = HiroUtils.AddDoubleAnimaton(0, 150, MsgGrid, "Opacity", null);
+            sb.Completed += delegate
+            {
+                MsgGrid.Visibility = Visibility.Collapsed;
+                ItemPanel.IsEnabled = true;
+            };
+            sb.Begin();
+        }
+
+        private void NewBtn_Click(object sender, RoutedEventArgs e)
+        {
+            fflag = 1;
+            UIDText.Text = string.Empty;
+            NameText.Text = string.Empty;
+            ModelText.Text = string.Empty;
+            UnitText.Text = string.Empty;
+            PriceText.Text = string.Empty;
+            DetailGrid.Visibility = Visibility.Visible;
+            ItemPanel.IsEnabled = false;
+            HiroUtils.AddPowerAnimation(1, DetailGrid, null, 50).Begin();
+        }
+
+        private void DeleteBtn_Click(object sender, RoutedEventArgs e)
+        {
+            DeleteIndex(ItemData.SelectedIndex);
+        }
+
+        private void DeleteIndex(int index)
+        {
+            iuids.RemoveAt(page * 20 + index);
+            Load_Part();
+        }
+
+        private void ClearBtn_Click(object sender, RoutedEventArgs e)
+        {
+            iuids.Clear();
+            iuidsp.Clear();
+            page = 0;
+            index = -1;
+        }
+
+        private void Load_Page(int p)
+        {
+            if(iuids.Count == 0)
+            {
+                iuidsp.Clear();
+                StatusLabel.Content = string.Format("第 {0}/{1} 页共计{2}项", 1, 1, iuids.Count);
+            }
+            if (p * 20 <= HiroUtils.GetPage(iuids.Count))
+            {
+                page = p;
+                iuidsp.Clear();
+                for (var i = 0; i < 20; i++)
+                {
+                    if (p * 20 + i >= iuids.Count)
+                        break;
+                    var ui = iuids[p * 20 + i];
+                    iuidsp.Add(ui);
+                }
+                StatusLabel.Content = string.Format("第 {0}/{1} 页共计{2}项", p + 1, HiroUtils.GetPage(iuids.Count), iuids.Count);
+            }
+        }
+
+        private void Load_Part()
+        {
+            Load_Page(page);
         }
     }
 }

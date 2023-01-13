@@ -30,6 +30,8 @@
                 <Frame x:Name="MainExplorer" NavigationUIVisibility="Hidden"></Frame>
             </DockPanel>
         </DockPanel>
+        <Grid x:Name="ChangeNameGrid" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Hidden">
+        </Grid>
         <Grid x:Name="NotificationBaseGrid" VerticalAlignment="Top" HorizontalAlignment="Left" Visibility="Hidden">
             <Label x:Name="NotificationBackground" Background="{DynamicResource BackgroundColorBrush}" BorderBrush="{DynamicResource FontColorBrush}" BorderThickness="2"></Label>
             <DockPanel x:Name="Notification" Margin="8">
