@@ -9,8 +9,9 @@
 
   <ItemGroup>
     <PackageReference Include="NPOI" Version="2.6.0" />
-    <PackageReference Include="System.Text.Json" Version="7.0.0" />
+    <PackageReference Include="System.Text.Json" Version="7.0.1" />
     <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
+    <PackageReference Include="ZXing.Net" Version="0.16.8" />
   </ItemGroup>
 
 </Project>

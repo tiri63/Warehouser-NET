@@ -29,6 +29,11 @@ namespace Warehouser_NET
         internal Page_About? pab = null;
         internal Page_Popped? ppp = null;
         internal Import_Code? ico = null;
+        internal Import_User? iur = null;
+        internal Import_Depart? idt = null;
+        internal Import_Usage? iue = null;
+        internal Import_Shelf? isf = null;
+        internal Import_Items? iis = null;
         internal int Notification_CD = 0;
 
         public FunWindow()
@@ -37,48 +42,6 @@ namespace Warehouser_NET
             UserName.Content = HiroUtils.userNickname + " (" + HiroUtils.userDepart + ")";
             pma = new Page_Main(this);
             MainExplorer.Navigate(pma);
-        }
-
-        internal void Notify(string content, string title = "")
-        {
-            title = title.Equals("") ? "通知" : title;
-            Dispatcher.Invoke(() =>
-            {
-                NotificationTitle.Content = title;
-                NotificationContent.Content = content;
-                if (Notification_CD > 0)
-                {
-                    Notification_CD = 5;
-                }
-                else
-                {
-                    NotificationBaseGrid.Visibility = Visibility.Visible;
-                    var sb = HiroUtils.AddPowerAnimation(0, NotificationBaseGrid, null, -NotificationBaseGrid.ActualWidth);
-                    sb.Completed += delegate
-                    {
-                        Notification_CD = 5;
-                        new Thread(() =>
-                        {
-                            while (Notification_CD > 0)
-                            {
-                                Notification_CD--;
-                                Thread.Sleep(1000);
-                            }
-                            Dispatcher.Invoke(() =>
-                            {
-                                var sb2 = HiroUtils.AddPowerAnimation(0, NotificationBaseGrid, null, null, -NotificationBaseGrid.ActualWidth);
-                                sb2.Completed += delegate
-                                {
-                                    NotificationBaseGrid.Visibility = Visibility.Hidden;
-                                    Canvas.SetLeft(NotificationBaseGrid, -NotificationBaseGrid.ActualWidth);
-                                };
-                                sb2.Begin();
-                            });
-                        }).Start();
-                    };
-                    sb.Begin();
-                }
-            });
         }
 
         private void LogOut_Click(object sender, RoutedEventArgs e)

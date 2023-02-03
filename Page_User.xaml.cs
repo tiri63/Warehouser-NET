@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Windows;
@@ -16,7 +17,6 @@ namespace Warehouser_NET
         internal System.Collections.ObjectModel.ObservableCollection<UserClass> user_all = new System.Collections.ObjectModel.ObservableCollection<UserClass>();
         internal System.Collections.ObjectModel.ObservableCollection<UserClass> user_p = new System.Collections.ObjectModel.ObservableCollection<UserClass>();
         internal System.Collections.ObjectModel.ObservableCollection<UserClass> user_search = new System.Collections.ObjectModel.ObservableCollection<UserClass>();
-        internal System.Collections.ObjectModel.ObservableCollection<int> deid = new System.Collections.ObjectModel.ObservableCollection<int>();
         internal int flag = 0;
         internal int page = 0;
         internal int index = 0;
@@ -27,25 +27,28 @@ namespace Warehouser_NET
         {
             InitializeComponent();
             ItemData.ItemsSource = user_p;
-            foreach(var i in HiroUtils.roles)
+            foreach (var i in HiroUtils.roles)
             {
                 RoleCombo.Items.Add(i);
             };
             new Thread(() =>
             {
-                getUsers();
+                HiroUtils.getDeparts();
+                GetUsers();
             }).Start();
             this.parent = parent;
         }
 
-        private bool getUsers()
+        private bool GetUsers()
         {
+            flag = 0;
             Dispatcher.Invoke(() =>
             {
                 ItemPanel.IsEnabled = false;
                 ShowMsg("服务器通信", "正在从服务器上获取最新数据……", true);
                 user_all.Clear();
                 SearchMethod.Items.Clear();
+                SearchMethod.SelectedIndex = -1;
             });
             try
             {
@@ -62,7 +65,7 @@ namespace Warehouser_NET
                     {
                         var a = UserClass.Parse(ja[i]);
                         user_all.Add(a);
-                        dic.TryAdd(a.Depart.Name,"1");
+                        dic.TryAdd(a.Depart.Name, "1");
                     });
 
                 };
@@ -98,6 +101,7 @@ namespace Warehouser_NET
         {
             if (ItemData.SelectedIndex != -1)
             {
+                index = ItemData.SelectedIndex;
                 ShowDetail(ItemData.SelectedIndex);
             }
         }
@@ -129,19 +133,16 @@ namespace Warehouser_NET
         {
             Title_Label.Content = "详细信息";
             DetailPrgBar.Visibility = Visibility.Collapsed;
-            var target = flag == 0 ? user_all[index] : user_all[index];
-            IDLabel.Content = target.Name;
+            var target = flag == 0 ? user_all[page * 20 + index] : user_search[page * 20 + index];
+            IDText.Content = target.Name;
             NameText.Text = target.Nickname;
-            HiroUtils.getDeparts();
             Dispatcher.Invoke(() =>
             {
                 DepartCombo.Items.Clear();
-                deid.Clear();
             });
-            foreach(var i in HiroUtils.depart_all)
+            foreach (var i in HiroUtils.depart_all)
             {
                 DepartCombo.Items.Add(i.Name);
-                deid.Add(i.ID);
                 if (target.Depart.ID == i.ID)
                     DepartCombo.SelectedIndex = DepartCombo.Items.Count - 1;
             }
@@ -171,7 +172,7 @@ namespace Warehouser_NET
         {
             var ap = flag == 0 ? HiroUtils.GetPage(user_all.Count) : HiroUtils.GetPage(user_search.Count);
             var ac = flag == 0 ? user_all.Count : user_search.Count;
-            if (p <= ap && p >= 1)
+            if ((p <= ap || ap == 0) && p >= 1)
             {
                 p--;
                 user_p.Clear();
@@ -183,7 +184,7 @@ namespace Warehouser_NET
                     var ui = flag == 0 ? user_all[p * 20 + i] : user_search[p * 20 + i];
                     user_p.Add(ui);
                 }
-                StatusLabel.Content = string.Format("第 {0}/{1} 页共计{2}项", p + 1, ap, ac);
+                StatusLabel.Content = string.Format("第 {0}/{1} 页 共计{2}项", p + 1, ap, ac);
             }
         }
 
@@ -192,30 +193,34 @@ namespace Warehouser_NET
             Title_Label.Content = "与服务器同步数据……";
             HiroUtils.AddPowerAnimation(0, Title_Label, null, 50).Begin();
             DetailPrgBar.Visibility = Visibility.Visible;
-            /*new Thread(() =>
+            new Thread(() =>
             {
-                var uid = new UserClass();
+                var uc = new UserClass();
                 Dispatcher.Invoke(() =>
                 {
-                    uid = new UIDClass()
+                    var de = HiroUtils.depart_all.Where(x => x.ID == DepartCombo.SelectedIndex).FirstOrDefault();
+                    uc = new UserClass()
                     {
-                        UID = UIDText.Content.ToString(),
-                        Name = NameText.Text,
-                        Model = ModelText.Text,
-                        Unit = UnitText.Text,
-                        Price = PriceText.Text
+                        Name = IDText.Content.ToString(),
+                        Nickname = NameText.Text,
+                        Depart = de,
+                        Privilege = RoleCombo.SelectedIndex,
+                        Role = HiroUtils.roles[RoleCombo.SelectedIndex]
                     };
-                    code_p[index] = uid;
-                    code_all[page * 20 + index] = uid;
                 });
-                var jn = HiroUtils.ParseJson(HiroUtils.SendRequest("/uid", new List<string>() { "action", "uid", "username", "token", "device" },
-                        new List<string>() { "2", uid.toJson().ToString(), HiroUtils.userName, HiroUtils.userToken, "PC" }));
+                var jn = HiroUtils.ParseJson(HiroUtils.SendRequest("/user", new List<string>() { "action", "user", "username", "token", "device" },
+                        new List<string>() { "2", uc.toJson().ToString(), HiroUtils.userName, HiroUtils.userToken, "PC" }));
                 if (jn != null)
                     Dispatcher.Invoke(() =>
                     {
+                        user_p[index] = uc;
+                        if (flag == 0)
+                            user_all[page * 20 + index] = uc;
+                        else
+                            user_search[page * 20 + index] = uc;
                         HideDetail();
                     });
-            }).Start();*/
+            }).Start();
         }
 
         private void CancelBtn_Click(object sender, RoutedEventArgs e)
@@ -225,12 +230,109 @@ namespace Warehouser_NET
 
         private void ResetPwdBtn_Click(object sender, RoutedEventArgs e)
         {
-
+            if (ItemData.SelectedIndex != -1)
+            {
+                index = ItemData.SelectedIndex;
+                ResetGrid.Visibility = Visibility.Visible;
+                ResetTitle.Content = string.Format("重置 {0} 的密码", user_p[index].Nickname);
+                ItemPanel.IsEnabled = false;
+                HiroUtils.AddPowerAnimation(1, ResetGrid, null, 50).Begin();
+            }
         }
 
         private void RefreashBtn_Click(object sender, RoutedEventArgs e)
         {
-            getUsers();
+            GetUsers();
+        }
+
+        private void ResetCancelBtn_Click(object sender, RoutedEventArgs e)
+        {
+            HideReset();
+        }
+
+        private void ResetOKBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (NewPwd.Password.Equals(RepeatPwd.Password))
+            {
+                new Thread(() =>
+                {
+                    var value = new List<string>();
+                    Dispatcher.Invoke(() =>
+                    {
+                        value = new List<string>() { "3", NewPwd.Password, user_p[index].Name, HiroUtils.userName, HiroUtils.userToken, "PC" };
+                    });
+                    var jn = HiroUtils.ParseJson(HiroUtils.SendRequest("/user", new List<string>() { "action", "newPwd", "targetname", "username", "token", "device" }, value));
+                    if (jn != null)
+                        Dispatcher.Invoke(() =>
+                        {
+                            HideReset();
+                        });
+                }).Start();
+            }
+            else
+            {
+                HiroUtils.Notify("两次输入的密码不匹配", "不匹配");
+            }
+
+
+        }
+
+        private void HideReset()
+        {
+            var sb = HiroUtils.AddDoubleAnimaton(0, 150, ResetGrid, "Opacity", null);
+            sb.Completed += delegate
+            {
+                ResetGrid.Visibility = Visibility.Collapsed;
+                ItemPanel.IsEnabled = true;
+            };
+            sb.Begin();
+        }
+
+        private void SearchMethod_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (SearchMethod.SelectedIndex > -1 && findex != SearchMethod.SelectedIndex)
+            {
+                findex = SearchMethod.SelectedIndex;
+                if (findex == 0)
+                {
+                    GetUsers();
+                }
+                else
+                {
+                    flag = 1;
+                    var de = SearchMethod.Items[findex].ToString();
+                    user_search.Clear();
+                    foreach (var i in user_all)
+                    {
+                        if (i.Depart.Name.Equals(de))
+                        {
+                            user_search.Add(i);
+                        }
+                    };
+                    Load_Page(1);
+                }
+            }
+        }
+
+        private void ImportBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (parent != null)
+            {
+                parent.iur ??= new Import_User();
+                if (!isolated)
+                    parent.MainExplorer.Navigate(parent.iur);
+                else if (parent.iur.isolated == false)
+                {
+                    if (parent.MainExplorer.Content == parent.iur)
+                    {
+                        parent.ppp ??= new Page_Popped();
+                        parent.MainExplorer.Navigate(parent.ppp);
+                    }
+                    new Explorer(parent.iur, parent).Show();
+                    parent.iur.isolated = true;
+                }
+
+            }
         }
     }
 }

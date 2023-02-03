@@ -12,9 +12,10 @@
         <DockPanel x:Name="ItemPanel" Visibility="Visible">
             <DockPanel x:Name="SubPanel" DockPanel.Dock="Top">
                 <Button x:Name="ImportBtn" Content="新增/导入" VerticalAlignment="Center" HorizontalAlignment="Left" Width="90" Height="20" Click="ImportBtn_Click"/>
-                <Label x:Name="StatusLabel" Content="第 {0}/{1} 页共计{2}项"  VerticalAlignment="Center" HorizontalAlignment="Left" MouseLeftButtonDown="StatusLabel_MouseLeftButtonDown"/>
+                <Label x:Name="StatusLabel" Content="第 {0}/{1} 页 共计{2}项"  VerticalAlignment="Center" HorizontalAlignment="Left" MouseLeftButtonDown="StatusLabel_MouseLeftButtonDown"/>
                 <TextBox x:Name="PageBox"  VerticalAlignment="Center" HorizontalAlignment="Left"  Visibility="Collapsed" InputScope="Number" KeyDown="PageBox_KeyDown" Width="{Binding ActualWidth, ElementName=StatusLabel, Mode=OneWay}"></TextBox>
-                <Button x:Name="DeleteBtn" Content="删除" VerticalAlignment="Center" HorizontalAlignment="Left" Width="40" Height="20" Click="DeleteBtn_Click"/>
+                <!-- Delete function shouldn't exist, so it's visibility is hidden ( although this works fine-->
+                <Button x:Name="DeleteBtn" Visibility="Collapsed" Content="删除" VerticalAlignment="Center" HorizontalAlignment="Left" Width="40" Height="20" Click="DeleteBtn_Click"/>
                 <Grid Width="10"></Grid>
                 <Button x:Name="RefreashBtn" Content="刷新" VerticalAlignment="Center" HorizontalAlignment="Left" Width="40" Height="20" Click="RefreashBtn_Click"/>
                 <Grid x:Name="SearchGrid" VerticalAlignment="Top" HorizontalAlignment="Right" Width="200" DockPanel.Dock="Right">
@@ -77,7 +78,7 @@
             <Label x:Name="MsgBackground" Background="{DynamicResource BackgroundColorBrush}" Opacity="0.8"/>
             <Label x:Name="DockPanelBackground" BorderBrush="{DynamicResource FontColorBrush}" BorderThickness="2" Background="{DynamicResource BackgroundColorBrush}" Opacity="0.8" HorizontalAlignment="Center" VerticalAlignment="Center" Width="{Binding ActualWidth, ElementName=MsgCenterGrid, Mode=OneWay}" Height="{Binding ActualHeight, ElementName=MsgCenterGrid, Mode=OneWay}"/>
             <DockPanel x:Name="MsgCenterGrid" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Label x:Name="MsgTitle" DockPanel.Dock="Top" Content="收到一条新消息" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Margin="20,20,0,10" MouseDoubleClick="MsgTitle_MouseDoubleClick" />
+                <Label x:Name="MsgTitle" DockPanel.Dock="Top" Content="收到一条新消息" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Margin="20,20,0,10" />
                 <Label x:Name="MsgContent" DockPanel.Dock="Top" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="40,10,30,10" >
                     <ScrollViewer x:Name="sv" Content="收到新消息，请双击查看" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"/>
                 </Label>

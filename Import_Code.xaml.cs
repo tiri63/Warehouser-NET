@@ -1,16 +1,12 @@
 ﻿using Microsoft.Win32;
-using NPOI.SS.Formula.Functions;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
-using System.Security.Cryptography;
 using System.Text.Json.Nodes;
 using System.Windows;
 using System.Windows.Controls;
-using static ICSharpCode.SharpZipLib.Zip.ExtendedUnixData;
 
 namespace Warehouser_NET
 {
@@ -127,8 +123,10 @@ namespace Warehouser_NET
                 return false;
             }
         }
-        private string GetCellValue(ICell cell)
+        private string GetCellValue(ICell? cell)
         {
+            if (cell == null)
+                return string.Empty;
             switch (cell.CellType)
             {
                 case CellType.Numeric:
@@ -268,8 +266,8 @@ namespace Warehouser_NET
                             if (i * 20 + j >= iuids.Count)
                                 break;
                             ja.Add(iuids[i * 20 + j].toJson());
-                            var jo = HiroUtils.ParseJson(HiroUtils.SendRequest("/uid", new List<string>() { "action", "username", "token", "device", "uids" },
-                            new List<string>() { "4", HiroUtils.userName, HiroUtils.userToken, "PC", ja.ToString().Replace(Environment.NewLine, " ") }));
+                            var jo = HiroUtils.ParseJson(HiroUtils.SendRequest("/uid", new List<string>() { "action", "username", "token", "device", "uids", "uid" },
+                            new List<string>() { "4", HiroUtils.userName, HiroUtils.userToken, "PC", ja.ToString().Replace(Environment.NewLine, " "), ja[0].ToString() }));
                             if (jo != null)
                             {
                                 continue;
@@ -359,24 +357,18 @@ namespace Warehouser_NET
         }
         private void OKBtn1_Click(object sender, RoutedEventArgs e)
         {
+            var target = new UIDClass
+            {
+                UID = UIDText.Text,
+                Name = NameText.Text,
+                Model = ModelText.Text,
+                Unit = UnitText.Text,
+                Price = PriceText.Text
+            };
             if (fflag == 0)
-                iuids[page * 20 + index] = new UIDClass
-                {
-                    UID = UIDText.Text,
-                    Name = NameText.Text,
-                    Model = ModelText.Text,
-                    Unit = UnitText.Text,
-                    Price = PriceText.Text
-                };
+                iuids[page * 20 + index] = target;
             else
-                iuids.Add(new UIDClass
-                {
-                    UID = UIDText.Text,
-                    Name = NameText.Text,
-                    Model = ModelText.Text,
-                    Unit = UnitText.Text,
-                    Price = PriceText.Text
-                });
+                iuids.Add(target);
             HideDetail();
             Load_Part();
         }
@@ -425,7 +417,8 @@ namespace Warehouser_NET
 
         private void DeleteBtn_Click(object sender, RoutedEventArgs e)
         {
-            DeleteIndex(ItemData.SelectedIndex);
+            if (ItemData.SelectedIndex != -1)
+                DeleteIndex(ItemData.SelectedIndex);
         }
 
         private void DeleteIndex(int index)
@@ -444,10 +437,10 @@ namespace Warehouser_NET
 
         private void Load_Page(int p)
         {
-            if(iuids.Count == 0)
+            if (iuids.Count == 0)
             {
                 iuidsp.Clear();
-                StatusLabel.Content = string.Format("第 {0}/{1} 页共计{2}项", 1, 1, iuids.Count);
+                StatusLabel.Content = string.Format("第 {0}/{1} 页 共计{2}项", 1, 1, iuids.Count);
             }
             if (p * 20 <= HiroUtils.GetPage(iuids.Count))
             {
@@ -460,7 +453,7 @@ namespace Warehouser_NET
                     var ui = iuids[p * 20 + i];
                     iuidsp.Add(ui);
                 }
-                StatusLabel.Content = string.Format("第 {0}/{1} 页共计{2}项", p + 1, HiroUtils.GetPage(iuids.Count), iuids.Count);
+                StatusLabel.Content = string.Format("第 {0}/{1} 页 共计{2}项", p + 1, HiroUtils.GetPage(iuids.Count), iuids.Count);
             }
         }
 

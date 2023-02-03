@@ -1,5 +1,7 @@
-﻿using System;
+﻿using NPOI.SS.Formula.Functions;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading;
@@ -16,54 +18,26 @@ namespace Warehouser_NET
     /// </summary>
     public partial class Page_Depart : Page
     {
-        internal System.Collections.ObjectModel.ObservableCollection<DepartClass> depart_search = new System.Collections.ObjectModel.ObservableCollection<DepartClass>();
-        internal int flag = 0;
+        //internal System.Collections.ObjectModel.ObservableCollection<DepartClass> depart_search = new System.Collections.ObjectModel.ObservableCollection<DepartClass>();
+        //internal int flag = 0;
         internal bool isolated = false;
         private FunWindow? parent = null;
+        internal int index = 0;
         public Page_Depart(FunWindow parent)
         {
             InitializeComponent();
             ItemData.ItemsSource = HiroUtils.depart_all;
             new Thread(() =>
             {
-                getDeparts();
+                HiroUtils.getDeparts();
+                Dispatcher.Invoke(() =>
+                {
+                    StatusLabel.Content = string.Format("共计{0}项", HiroUtils.depart_all.Count);
+                });
             }).Start();
             this.parent = parent;
         }
 
-        private bool getDeparts()
-        {
-            try
-            {
-                var jo = HiroUtils.ParseJson(HiroUtils.SendRequest("/depart", new List<string>() { "action" }, new List<string>() { "2" }));
-                if (jo != null)
-                {
-                    var ja = jo["msg"].AsArray();
-                    Dispatcher.Invoke(() =>
-                    {
-                        StatusLabel.Content = string.Format("共计{0}项", ja.Count);
-                    });
-                    for (int i = 0; i < ja.Count; i++)
-                    {
-                        Dispatcher.Invoke(() =>
-                        {
-                            HiroUtils.depart_all.Add(DepartClass.Parse(ja[i]));
-                        });
-
-                    };
-                    return true;
-                }
-                return false;
-            }
-            catch (Exception ex)
-            {
-                Dispatcher.Invoke(() =>
-                {
-                    HiroUtils.LogError(ex, "Exception.Depart.Get");
-                });
-                return false;
-            }
-        }
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             HiroUtils.AddPowerAnimation(0, BaseGrid, null, 50).Begin();
@@ -72,10 +46,96 @@ namespace Warehouser_NET
         {
             if (ItemData.SelectedIndex != -1)
             {
-                if (flag == 0)
-                    HiroUtils.Notify("部门信息 - 库存管理", HiroUtils.depart_all[ItemData.SelectedIndex].ToIDString());
-                else
-                    HiroUtils.Notify("部门信息 - 库存管理", depart_search[ItemData.SelectedIndex].ToIDString());
+                index = ItemData.SelectedIndex;
+                ShowDetail(ItemData.SelectedIndex);
+            }
+        }
+
+        private void OKBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Title_Label.Content = "与服务器同步数据……";
+            HiroUtils.AddPowerAnimation(0, Title_Label, null, 50).Begin();
+            DetailPrgBar.Visibility = Visibility.Visible;
+            new Thread(() =>
+            {
+                var dc = new DepartClass();
+                Dispatcher.Invoke(() =>
+                {
+                    dc = new DepartClass()
+                    {
+                        ID = Convert.ToInt32(IDText.Content.ToString()),
+                        Name = NameText.Text
+                    };
+                });
+                var jn = HiroUtils.ParseJson(HiroUtils.SendRequest("/depart", new List<string>() { "action", "depart", "username", "token", "device" },
+                        new List<string>() { "1", dc.toJson().ToString(), HiroUtils.userName, HiroUtils.userToken, "PC" }));
+                HiroUtils.LogtoFile(dc.toJson().ToString());
+                if (jn != null)
+                    Dispatcher.Invoke(() =>
+                    {
+                        HiroUtils.depart_all[index].Name = dc.Name;
+                        HideDetail();
+                    });
+            }).Start();
+        }
+
+        private void CancelBtn_Click(object sender, RoutedEventArgs e)
+        {
+            HideDetail();
+        }
+        private void ShowDetail(int index)
+        {
+            Title_Label.Content = "详细信息";
+            DetailPrgBar.Visibility = Visibility.Collapsed;
+            var target = HiroUtils.depart_all[index];
+            IDText.Content = target.ID.ToString();
+            NameText.Text = target.Name;
+            DetailGrid.Visibility = Visibility.Visible;
+            ItemPanel.IsEnabled = false;
+            HiroUtils.AddPowerAnimation(1, DetailGrid, null, 50).Begin();
+        }
+
+        private void HideDetail()
+        {
+            var sb = HiroUtils.AddDoubleAnimaton(0, 150, DetailGrid, "Opacity", null);
+            sb.Completed += delegate
+            {
+                DetailGrid.Visibility = Visibility.Collapsed;
+                ItemPanel.IsEnabled = true;
+            };
+            sb.Begin();
+        }
+
+        private void RefreashBtn_Click(object sender, RoutedEventArgs e)
+        {
+            new Thread(() =>
+            {
+                HiroUtils.getDeparts();
+                Dispatcher.Invoke(() =>
+                {
+                    StatusLabel.Content = string.Format("共计{0}项",HiroUtils.depart_all.Count);
+                });
+            }).Start();
+        }
+
+        private void ImportBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (parent != null)
+            {
+                parent.idt ??= new Import_Depart();
+                if (!isolated)
+                    parent.MainExplorer.Navigate(parent.idt);
+                else if (parent.idt.isolated == false)
+                {
+                    if (parent.MainExplorer.Content == parent.idt)
+                    {
+                        parent.ppp ??= new Page_Popped();
+                        parent.MainExplorer.Navigate(parent.ppp);
+                    }
+                    new Explorer(parent.idt, parent).Show();
+                    parent.idt.isolated = true;
+                }
+
             }
         }
     }

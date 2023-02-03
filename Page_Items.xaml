@@ -11,13 +11,15 @@
     <Grid  x:Name="BaseGrid">
         <DockPanel x:Name="ItemPanel">
             <DockPanel x:Name="SubPanel" DockPanel.Dock="Top">
-                <Button x:Name="ImportBtn" Content="新增/导入" VerticalAlignment="Center" HorizontalAlignment="Left" Width="90" Height="20"></Button>
+                <Button x:Name="ImportBtn" Content="新增/导入" VerticalAlignment="Center" HorizontalAlignment="Left" Width="90" Height="20" Click="ImportBtn_Click"></Button>
                 <Label x:Name="StatusLabel" Content="共计{0}项"  VerticalAlignment="Center" HorizontalAlignment="Left"></Label>
+                <Grid Width="10"></Grid>
+                <Button x:Name="RefreashBtn" Content="刷新" VerticalAlignment="Center" HorizontalAlignment="Left" Width="40" Height="20" Click="RefreashBtn_Click"/>
                 <Grid x:Name="SearchGrid" VerticalAlignment="Top" HorizontalAlignment="Right" Width="200" DockPanel.Dock="Right">
                     <Label x:Name="SearchTextLabel" Width="200" Content="按回车键搜索" FontStyle="Italic" Margin="{Binding Margin, ElementName=SearchTextBox}" HorizontalAlignment="{Binding HorizontalAlignment, ElementName=SearchTextBox}" VerticalAlignment="{Binding VerticalAlignment, ElementName=SearchTextBox}" VerticalContentAlignment="Center"/>
-                    <TextBox x:Name="SearchTextBox" Background="Transparent"  VerticalContentAlignment="Center" BorderBrush="{DynamicResource FontColorBrush}" TextChanged="SearchTextBox_TextChanged"></TextBox>
+                    <TextBox x:Name="SearchTextBox" Background="Transparent"  VerticalContentAlignment="Center" BorderBrush="{DynamicResource FontColorBrush}" TextChanged="SearchTextBox_TextChanged" KeyDown="SearchTextBox_KeyDown"></TextBox>
                 </Grid>
-                <ComboBox x:Name="SearchMethod" VerticalAlignment="Center" HorizontalAlignment="Right" DockPanel.Dock="Right" Width="80" SelectedIndex="2" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="{Binding ActualHeight, ElementName=SubPanel, Mode=OneWay}">
+                <ComboBox x:Name="SearchMethod" VerticalAlignment="Center" HorizontalAlignment="Right" DockPanel.Dock="Right" Width="80" SelectedIndex="-1" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Height="{Binding ActualHeight, ElementName=SubPanel, Mode=OneWay}">
                     <ComboBoxItem Content="货架号"/>
                     <ComboBoxItem Content="货物名"/>
                     <ComboBoxItem Content="唯一编码"/>
@@ -74,6 +76,53 @@
                 </Grid>
             </DockPanel>
         </DockPanel>
-        
+        <Grid x:Name="MsgGrid" Visibility="Collapsed">
+            <Label x:Name="MsgBackground" Background="{DynamicResource BackgroundColorBrush}" Opacity="0.8"/>
+            <Label x:Name="DockPanelBackground" BorderBrush="{DynamicResource FontColorBrush}" BorderThickness="2" Background="{DynamicResource BackgroundColorBrush}" Opacity="0.8" HorizontalAlignment="Center" VerticalAlignment="Center" Width="{Binding ActualWidth, ElementName=MsgCenterGrid, Mode=OneWay}" Height="{Binding ActualHeight, ElementName=MsgCenterGrid, Mode=OneWay}"/>
+            <DockPanel x:Name="MsgCenterGrid" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Label x:Name="MsgTitle" DockPanel.Dock="Top" Content="收到一条新消息" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" Margin="20,20,0,10"/>
+                <Label x:Name="MsgContent" DockPanel.Dock="Top" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="40,10,30,10" >
+                    <ScrollViewer x:Name="sv" Content="收到新消息，请双击查看" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"/>
+                </Label>
+                <ProgressBar x:Name="MsgProgressBar"  IsIndeterminate="True" DockPanel.Dock="Top" Height="15" Margin="20,10,20,20"/>
+                <Button x:Name="MsgOKButton" Content="OK" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" Margin="5,10,20,20" HorizontalAlignment="Right" VerticalAlignment="Top" Width="50" Height="20"/>
+            </DockPanel>
+        </Grid>
+        <Grid x:Name="DetailGrid" Visibility="Collapsed">
+            <Label x:Name="DetailBackground" Background="{DynamicResource BackgroundColorBrush}" Opacity="0.8"/>
+            <Label x:Name="DetailDockPanelBackground" BorderBrush="{DynamicResource FontColorBrush}" BorderThickness="2" Background="{DynamicResource BackgroundColorBrush}" Opacity="0.8" HorizontalAlignment="Center" VerticalAlignment="Center" Width="{Binding ActualWidth, ElementName=DetailDock, Mode=OneWay}" Height="{Binding ActualHeight, ElementName=DetailDock, Mode=OneWay}"/>
+            <DockPanel x:Name="DetailDock" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <DockPanel x:Name="DetailsMainGrid" DockPanel.Dock="Top">
+                    <Grid x:Name="DetailLabelGrid" DockPanel.Dock="Top">
+                        <ProgressBar VerticalAlignment="Top" IsIndeterminate="True" Margin="5,5,5,0" Height="5" x:Name="DetailPrgBar" Visibility="Visible"></ProgressBar>
+                        <Label x:Name="Title_Label" Content="详细信息" VerticalAlignment="Top" HorizontalAlignment="Left" FontStyle="Italic" Margin="0,10,0,0" FontSize="25"/>
+                    </Grid>
+                    <Grid x:Name="LabelGrid" DockPanel.Dock="Left" Margin="10,10,0,0">
+                        <Label x:Name="ShelfLabel" Content="货架 ID"  FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="15" Margin="0" Height="30"/>
+                        <Label x:Name="DepartLabel" Content="部门"  FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="15" Margin="0,35,0,0" Height="30"/>
+                        <Label x:Name="NameLabel" Content="名称"  FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="15" Margin="0,70,0,0" Height="30"/>
+                        <Label x:Name="UIDLabel" Content="唯一编码"  FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="15" Margin="0,105,0,0" Height="30"/>
+                        <Label x:Name="ModelLabel" Content="型号"  FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="15" Margin="0,140,0,0" Height="30"/>
+                        <Label x:Name="CountLabel" Content="数量(单位)"  FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="15" Margin="0,175,0,0" Height="30"/>
+                        <Label x:Name="PriceLabel" Content="价格"  FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="15" Margin="0,210,0,0" Height="30"/>
+                        <Label x:Name="UsageLabel" Content="用途"  FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="15" Margin="0,245,0,0" Height="30"/>
+                    </Grid>
+                    <Grid x:Name="TextGrid" DockPanel.Dock="Right" Margin="10,10,10,0">
+                        <TextBox x:Name="ShelfText" Text="Shelf" IsReadOnly="True" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Left" FontSize="15" Margin="0" Height="30" Width="350"/>
+                        <TextBox x:Name="DepartText" Text="Depart" IsReadOnly="True" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Left" FontSize="15" Margin="0,35,0,0" Height="30" Width="350"/>
+                        <TextBox x:Name="NameText" Text="Name" IsReadOnly="True" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Left" FontSize="15" Margin="0,70,0,0" Height="30" Width="350"/>
+                        <TextBox x:Name="UIDText" Text="UID" IsReadOnly="True" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Left" FontSize="15" Margin="0,105,0,0" Height="30" Width="350"/>
+                        <TextBox x:Name="ModelText" Text="Model" IsReadOnly="True" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Left" FontSize="15" Margin="0,140,0,0" Height="30" Width="350"/>
+                        <TextBox x:Name="CountText" Text="Count" IsReadOnly="True" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Left" FontSize="15" Margin="0,175,0,0" Height="30" Width="350"/>
+                        <TextBox x:Name="PriceText" Text="Price" IsReadOnly="True" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Left" FontSize="15" Margin="0,210,0,0" Height="30" Width="350"/>
+                        <TextBox x:Name="UsageText" Text="Usage" IsReadOnly="True" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Left" FontSize="15" Margin="0,245,0,0" Height="30" Width="350"/>
+                    </Grid>
+                </DockPanel>
+                <Grid x:Name="Ensure"  DockPanel.Dock="Bottom" Margin="0,10,0,10">
+                    <Button x:Name="OKBtn" Content="OK" HorizontalAlignment="Right" Width="40" Margin="0,0,60,0" Height="20" VerticalAlignment="Bottom" Click="OKBtn_Click"/>
+                    <Button x:Name="CancelBtn" Content="取消" VerticalAlignment="Center" HorizontalAlignment="Right" Width="40" Height="20" Margin="0,0,10,0" Click="CancelBtn_Click" />
+                </Grid>
+            </DockPanel>
+        </Grid>
     </Grid>
 </Page>

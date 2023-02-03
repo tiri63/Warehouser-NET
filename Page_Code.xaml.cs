@@ -54,7 +54,7 @@ namespace Warehouser_NET
                     Dispatcher.Invoke(() =>
                     {
                         var ap = flag == 0 ? code_all.Count % 20 == 0 ? code_all.Count / 20 + 1 : code_all.Count / 20 : code_search.Count % 20 == 0 ? code_search.Count / 20 + 1 : code_search.Count / 20;
-                        StatusLabel.Content = string.Format("第 {0}/{1} 页共计{2}项", 1, ap, ja.Count);
+                        StatusLabel.Content = string.Format("第 {0}/{1} 页 共计{2}项", 1, ap, ja.Count);
                     });
                     for (int i = 0; i < ja.Count; i++)
                     {
@@ -195,11 +195,6 @@ namespace Warehouser_NET
             PageBox.Visibility = Visibility.Visible;
         }
 
-        private void MsgTitle_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            HideMsg();
-        }
-
         private void RefreashBtn_Click(object sender, RoutedEventArgs e)
         {
             new Thread(() =>
@@ -331,7 +326,7 @@ namespace Warehouser_NET
         {
             var ap = flag == 0 ? HiroUtils.GetPage(code_all.Count) : HiroUtils.GetPage(code_search.Count);
             var ac = flag == 0 ? code_all.Count : code_search.Count;
-            if (p <= ap && p >= 1)
+            if ((p <= ap || ap == 0) && p >= 1)
             {
                 p--;
                 code_p.Clear();
@@ -343,7 +338,7 @@ namespace Warehouser_NET
                     var ui = flag == 0 ? code_all[p * 20 + i] : code_search[p * 20 + i];
                     code_p.Add(ui);
                 }
-                StatusLabel.Content = string.Format("第 {0}/{1} 页共计{2}项", p + 1, ap, ac);
+                StatusLabel.Content = string.Format("第 {0}/{1} 页 共计{2}项", p + 1, ap, ac);
             }
         }
 

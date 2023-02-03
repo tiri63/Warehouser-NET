@@ -1,4 +1,6 @@
 ﻿using Microsoft.WindowsAPICodePack.Shell.PropertySystem;
+using NPOI.SS.Formula.Functions;
+using NPOI.Util;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -30,15 +32,15 @@ namespace Warehouser_NET
             var usage = json["usage"].ToString().Replace("{", "").Replace("}", "").Split(",");
             List<int> uin = new List<int>();
             string ust = string.Empty;
-            foreach(var usa in usage)
+            foreach (var usa in usage)
             {
                 int oint;
                 if (int.TryParse(usa, out oint))
                 {
                     uin.Add(oint);
-                    foreach(var us in HiroUtils.usages)
+                    foreach (var us in HiroUtils.usages)
                     {
-                        if(us.Code == oint)
+                        if (us.Code == oint)
                         {
                             if (ust == string.Empty)
                                 ust = us.Info;
@@ -47,7 +49,7 @@ namespace Warehouser_NET
                         }
                     }
                 }
-                    
+
             }
             return new ItemClass()
             {
@@ -130,12 +132,17 @@ namespace Warehouser_NET
                 $"用途 : \t\t{FunctionString}";
         }
 
+        internal object toJson()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class UserClass : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         private string name;
+        private string pwd;
         private DepartClass depart;
         private string nick;
         private int privilege;
@@ -152,11 +159,18 @@ namespace Warehouser_NET
             var pri = -1;
             if (!int.TryParse(json["privilege"].ToString(), out pri))
                 pri = -1;
+            var pwd = string.Empty;
+            try
+            {
+                pwd = json["pwd"].ToString();
+            }
+            catch { };
             DepartClass depart = DepartClass.Parse(json["depart"].AsObject());
             var role = pri < 0 ? "未激活" : pri > HiroUtils.roles.Count - 1 ? "超级管理员" : HiroUtils.roles[pri];
             return new UserClass()
             {
                 Name = json["username"].ToString(),
+                Password = pwd,
                 Nickname = json["nickname"].ToString(),
                 Depart = depart,
                 Privilege = pri,
@@ -172,6 +186,16 @@ namespace Warehouser_NET
             {
                 name = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+            }
+        }
+
+        public string Password
+        {
+            get { return pwd; }
+            set
+            {
+                pwd = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Password)));
             }
         }
 
@@ -218,10 +242,22 @@ namespace Warehouser_NET
 
         public override string ToString()
         {
-            return $"账户 : \t\t{Name}{Environment.NewLine}" +
+            return "此分支已废弃";
+            /*return $"账户 : \t\t{Name}{Environment.NewLine}" +
                 $"名称 : \t\t{Nickname}{Environment.NewLine}" +
                 $"部门信息 : \t{Depart.ToString()}{Environment.NewLine}" +
-                $"角色 : \t\t{Role}";
+                $"角色 : \t\t{Role}";*/
+        }
+
+        public JsonNode toJson()
+        {
+            var ret = new JsonObject();
+            ret.Add("username", Name);
+            ret.Add("pwd", Password);
+            ret.Add("nickname", Nickname);
+            ret.Add("depart", Depart.toJson().ToString());
+            ret.Add("privilege", Privilege.ToString());
+            return ret;
         }
     }
 
@@ -336,6 +372,17 @@ namespace Warehouser_NET
                 $"货架别称 : \t{Alias}{Environment.NewLine}" +
                 $"货架信息 : \t{Info}";
         }
+
+        internal JsonObject toJson()
+        {
+            var ret = new JsonObject();
+            ret.Add("depart", Depart.toJson().ToString());
+            ret.Add("mshelf", MID.ToString());
+            ret.Add("sshelf", SID.ToString());
+            ret.Add("alias", Alias);
+            ret.Add("desp", Info);
+            return ret;
+        }
     }
 
     internal class UsageClass : INotifyPropertyChanged
@@ -449,6 +496,19 @@ namespace Warehouser_NET
                 $"附加信息 :\t{(Info == null ? string.Empty : Info)}{Environment.NewLine}" +
                 $"可见性 :\t\t{(HideStr)}";
         }
+
+        internal JsonObject toJson()
+        {
+            var ret = new JsonObject();
+            ret.Add("id", Code.ToString());
+            ret.Add("name", Alias);
+            ret.Add("info", Info);
+            if (Hide)
+                ret.Add("hide", "1");
+            else
+                ret.Add("hide", "0");
+            return ret;
+        }
     }
 
     public class UIDClass : INotifyPropertyChanged
@@ -479,7 +539,7 @@ namespace Warehouser_NET
                     Price = json["price"].ToString()
                 };
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return new UIDClass()
                 {
@@ -490,7 +550,7 @@ namespace Warehouser_NET
                     Price = "出错"
                 };
             }
-            
+
         }
 
         public string UID
@@ -613,5 +673,28 @@ namespace Warehouser_NET
             return $"部门 ID : \t{ID}{Environment.NewLine}" +
                 $"部门名称 : \t{Name}";
         }
+        public JsonNode toJson()
+        {
+            var ret = new JsonObject();
+            ret.Add("id", ID.ToString());
+            ret.Add("name", Name);
+            return ret;
+        }
     }
+    #region 通知项目定义
+    public class Hiro_Notice
+    {
+        public string title;
+        public string msg;
+        public int time;
+        public Action? act;
+        public Hiro_Notice(string ms = "NULL", int ti = 1, string tit = "新消息", Action? ac = null)
+        {
+            msg = ms;
+            time = ti;
+            title = tit;
+            act = ac;
+        }
+    }
+    #endregion
 }

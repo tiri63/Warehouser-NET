@@ -11,6 +11,7 @@ namespace Warehouser_NET
     /// </summary>
     public partial class MainWindow : Window
     {
+        internal bool lflag = false;
         public MainWindow()
         {
             InitializeComponent();
@@ -19,33 +20,10 @@ namespace Warehouser_NET
                 try
                 {
                     HiroUtils.InitializeConfig();
-                    HiroUtils.usages.Clear();
-                    var jn = HiroUtils.ParseJson(HiroUtils.SendRequest("/usage", new List<string>() { "action" }, new List<string>() { "2" }));
-                    if (jn != null)
+                    if (HiroUtils.getUsages())
                     {
-                        JsonArray ja = jn["msg"].AsArray();
-                        foreach (var jo in ja)
-                        {
-                            string? info = null;
-                            try
-                            {
-                                info = jo["info"].ToString();
-                            }
-                            catch
-                            {
-
-                            }
-                            Thread.Sleep(100);
-                            HiroUtils.usages.Add(new UsageClass()
-                            {
-                                Code = int.Parse(jo["id"].ToString()),
-                                Alias = jo["name"].ToString(),
-                                Info = info,
-                                Hide = jo["hide"].ToString().ToLower().Equals("true") || jo["hide"].ToString().Equals("1"),
-                                HideStr = jo["hide"].ToString().ToLower().Equals("true") || jo["hide"].ToString().Equals("1") ? "隐藏" : "可见"
-                            });
-                        }
-                        Thread.Sleep(1000);
+                        Thread.Sleep(2000);
+                        //まるて読み込み中みたい
                     }
                     else
                     {
@@ -55,21 +33,23 @@ namespace Warehouser_NET
                         });
                         return;
                     }
-
-
                     var jn2 = HiroUtils.ParseJson(HiroUtils.SendRequest("/user", new List<string>() { "action", "username", "token", "device" },
                         new List<string>() { "0", HiroUtils.userName, HiroUtils.userToken, "PC" }));
                     Dispatcher.Invoke(() =>
                     {
                         if (jn2 != null)
                         {
+                            HiroUtils.userDepart = jn2["depart"]["name"].ToString();
+                            HiroUtils.userNickname = jn2["nickname"].ToString();
+                            HiroUtils.Write_Ini(HiroUtils.ConfigFilePath, "User", "UserDepart", HiroUtils.userDepart);
+                            HiroUtils.Write_Ini(HiroUtils.ConfigFilePath, "User", "NickName", HiroUtils.userNickname);
                             App.funWindow = new FunWindow();
                             App.funWindow.Show();
                             Close();
-
                         }
                         else
                         {
+                            lflag = true;
                             new Login().Show();
                             Close();
                         }
@@ -87,7 +67,7 @@ namespace Warehouser_NET
 
         private void StartWin_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (Application.Current.Windows.Count <= 0)
+            if (Application.Current.Windows.Count <= 0 && !lflag)
             {
                 HiroUtils.ExitApp();
             }

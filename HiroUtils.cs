@@ -1,6 +1,8 @@
 ﻿using Microsoft.VisualBasic;
+using NPOI.SS.Formula.Functions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -10,6 +12,7 @@ using System.Runtime.InteropServices;
 using System.Security.Policy;
 using System.Text;
 using System.Text.Json.Nodes;
+using System.Threading;
 using System.Windows;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
@@ -29,6 +32,7 @@ public class HiroUtils
     internal static System.Collections.ObjectModel.ObservableCollection<UsageClass> usages = new System.Collections.ObjectModel.ObservableCollection<UsageClass>();
     internal static System.Collections.ObjectModel.ObservableCollection<DepartClass> depart_all = new System.Collections.ObjectModel.ObservableCollection<DepartClass>();
     internal static List<string> roles = new List<string>() { "游客", "用户", "管理员", "超级管理员" };
+    internal static Hiro_Island? his = null;
     public HiroUtils()
     {
 
@@ -78,9 +82,11 @@ public class HiroUtils
                     break;
                 case "ec-011":
                     Notify("身份验证失败", "凭据失效");
+                    ret = null;
                     break;
                 case "ec-012":
                     Notify("账户密码和 ID 不匹配", "登陆失败");
+                    ret = null;
                     break;
                 case "ec-013":
                     Notify("操作未能成功进行", "操作失败");
@@ -156,34 +162,24 @@ public class HiroUtils
         userDepart = Read_Ini(ConfigFilePath, "User", "UserDepart", " ");
         userNickname = Read_Ini(ConfigFilePath, "User", "NickName", " ");
     }
-    internal static void Notify(string content, string title)
+    internal static void Notify(string content, string title, int time = 2, Action? act = null)
     {
-        Dispatcher.CurrentDispatcher.Invoke(() =>
+        Application.Current.Dispatcher.Invoke(() =>
         {
-            if (App.funWindow != null)
-                App.funWindow.Notify(content, title);
+            if (his != null)
+            {
+                his.notifications.Add(new Hiro_Notice(content, time, title, act));
+            }
             else
             {
-                if (title == "")
-                {
-                    MessageBox.Show(content, "信息 - 库存管理");
-                }
-                else
-                {
-                    MessageBox.Show(content, title);
-                }
+                his = new Hiro_Island(new Hiro_Notice(content, time, title, act));
+                his.Show();
             }
         });
     }
     internal static void Notify(string content)
     {
-        Dispatcher.CurrentDispatcher.Invoke(() =>
-        {
-            if (App.funWindow != null)
-                App.funWindow.Notify(content, "");
-            else
-                MessageBox.Show(content, "信息 - 库存管理");
-        });
+        Notify(content, "新消息", 2, null);
     }
 
     internal static void ExitApp()
@@ -290,7 +286,22 @@ public class HiroUtils
             str.Append($"Details: {ex.InnerException.Message}");
             str.Append($"StackTrace: {ex.InnerException.StackTrace}");
         }
-        Notify($"错误位置 : {Module}{Environment.NewLine}具体信息请查看日志", "发生错误");
+        Notify($"错误位置 : {Module}{Environment.NewLine}点击此文字查看日志", "发生错误",2,new Action(() =>
+        {
+            ProcessStartInfo pinfo_ = new ProcessStartInfo()
+            {
+                UseShellExecute = true,
+                FileName = "\"" + Path_Prepare(LogFilePath) + "\"",
+            };
+            try
+            {
+                _ = Process.Start(pinfo_);
+            }
+            catch
+            {
+                Notify("无法打开日志文件", "错误");
+            }
+        }));
         LogtoFile(str.ToString());
     }
 
@@ -341,7 +352,7 @@ public class HiroUtils
             return "";
     }
 
-    public static String Path_Prepare(string path)
+    public static string Path_Prepare(string path)
     {
         path = Path_Replace(path, "<current>", AppDomain.CurrentDomain.BaseDirectory);
         path = Path_Replace(path, "<system>", Environment.SystemDirectory);
@@ -378,7 +389,7 @@ public class HiroUtils
         return path;
     }
 
-    public static String Path_Prepare_EX(String path)
+    public static string Path_Prepare_EX(String path)
     {
         path = Path_Replace(path, "<yyyyy>", DateTime.Now.ToString("yyyyy"));
         path = Path_Replace(path, "<yyyy>", DateTime.Now.ToString("yyyy"));
@@ -427,9 +438,8 @@ public class HiroUtils
         }
         return sBuilder.ToString();
     }
-
     #region 添加double动画
-    public static Storyboard AddDoubleAnimaton(double? to, double mstime, DependencyObject value, string PropertyPath, Storyboard? sb, double? from = null)
+    public static Storyboard AddDoubleAnimaton(double? to, double mstime, DependencyObject value, string PropertyPath, Storyboard? sb, double? from = null, double decelerationRatio = 0.9, double accelerationRatio = 0)
     {
         sb ??= new Storyboard();
         DoubleAnimation? da = new DoubleAnimation();
@@ -438,12 +448,13 @@ public class HiroUtils
         if (to != null)
             da.To = to;
         da.Duration = TimeSpan.FromMilliseconds(mstime);
-        da.DecelerationRatio = 0.9;
+        da.DecelerationRatio = decelerationRatio;
+        da.AccelerationRatio = accelerationRatio;
         Storyboard.SetTarget(da, value);
         Storyboard.SetTargetProperty(da, new PropertyPath(PropertyPath));
         sb.Children.Add(da);
         sb.FillBehavior = FillBehavior.Stop;
-        sb.Completed += delegate
+        sb.Completed += (sender, args) =>
         {
             da = null;
             sb = null;
@@ -656,6 +667,58 @@ public class HiroUtils
             HiroInvoke(() =>
             {
                 LogError(ex, "Exception.Depart.Get");
+            });
+            return false;
+        }
+    }
+
+    public static bool getUsages()
+    {
+        HiroInvoke(() =>
+        {
+            usages.Clear();
+        });
+        try
+        {
+            var jn = ParseJson(SendRequest("/usage", new List<string>() { "action" }, new List<string>() { "2" }));
+            if (jn != null)
+            {
+                JsonArray ja = jn["msg"].AsArray();
+                foreach (var jo in ja)
+                {
+                    string? info = null;
+                    try
+                    {
+                        info = jo["info"].ToString();
+                    }
+                    catch
+                    {
+
+                    }
+                    HiroInvoke(() =>
+                    {
+                        usages.Add(new UsageClass()
+                        {
+                            Code = int.Parse(jo["id"].ToString()),
+                            Alias = jo["name"].ToString(),
+                            Info = info,
+                            Hide = jo["hide"].ToString().ToLower().Equals("true") || jo["hide"].ToString().Equals("1"),
+                            HideStr = jo["hide"].ToString().ToLower().Equals("true") || jo["hide"].ToString().Equals("1") ? "隐藏" : "可见"
+                        });
+                    });
+                }
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            HiroInvoke(() =>
+            {
+                LogError(ex, "Exception.Usages.Get");
             });
             return false;
         }
