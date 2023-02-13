@@ -442,7 +442,7 @@ namespace Warehouser_NET
                 iuidsp.Clear();
                 StatusLabel.Content = string.Format("第 {0}/{1} 页 共计{2}项", 1, 1, iuids.Count);
             }
-            if (p * 20 <= HiroUtils.GetPage(iuids.Count))
+            if (p <= HiroUtils.GetPage(iuids.Count))
             {
                 page = p;
                 iuidsp.Clear();
@@ -460,6 +460,24 @@ namespace Warehouser_NET
         private void Load_Part()
         {
             Load_Page(page);
+        }
+
+        private void PageMinus_Click(object sender, RoutedEventArgs e)
+        {
+            if (page > 1)
+            {
+                page--;
+                Load_Page(page);
+            }
+        }
+
+        private void PagePlus_Click(object sender, RoutedEventArgs e)
+        {
+            if (page <= HiroUtils.GetPage(iuids.Count))
+            {
+                page++;
+                Load_Page(page);
+            }
         }
     }
 }

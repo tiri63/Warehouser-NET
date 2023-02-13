@@ -12,7 +12,9 @@
         <DockPanel x:Name="ItemPanel" Visibility="Visible">
             <DockPanel x:Name="SubPanel" DockPanel.Dock="Top">
                 <Button x:Name="ImportBtn" Content="新增/导入" VerticalAlignment="Center" HorizontalAlignment="Left" Width="90" Height="20" Click="ImportBtn_Click"/>
-                <Label x:Name="StatusLabel" Content="第 {0}/{1} 页 共计{2}项"  VerticalAlignment="Center" HorizontalAlignment="Left" MouseLeftButtonDown="StatusLabel_MouseLeftButtonDown"/>
+                <Button x:Name="PageMinus" Content="◀"  VerticalAlignment="Center" HorizontalAlignment="Left" Width="30" Height="20" Click="PageMinus_Click" ></Button>
+                <Label x:Name="StatusLabel" Content="共计{0}项"  VerticalAlignment="Center" HorizontalAlignment="Left"></Label>
+                <Button x:Name="PagePlus" Content="▶"  VerticalAlignment="Center" HorizontalAlignment="Left" Width="30" Height="20" Click="PagePlus_Click" ></Button>
                 <TextBox x:Name="PageBox"  VerticalAlignment="Center" HorizontalAlignment="Left"  Visibility="Collapsed" InputScope="Number" KeyDown="PageBox_KeyDown" Width="{Binding ActualWidth, ElementName=StatusLabel, Mode=OneWay}"></TextBox>
                 <!-- Delete function shouldn't exist, so it's visibility is hidden ( although this works fine-->
                 <Button x:Name="DeleteBtn" Visibility="Collapsed" Content="删除" VerticalAlignment="Center" HorizontalAlignment="Left" Width="40" Height="20" Click="DeleteBtn_Click"/>

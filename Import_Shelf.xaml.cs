@@ -20,7 +20,7 @@ namespace Warehouser_NET
         internal System.Collections.ObjectModel.ObservableCollection<ShelfClass> ishelvesp = new System.Collections.ObjectModel.ObservableCollection<ShelfClass>();
         internal bool isolated = false;
         private FunWindow? parent = null;
-        internal int page = 0;
+        internal int page = 1;
         internal int index = 0;
         internal int fflag = 0;
         public Import_Shelf()
@@ -485,6 +485,25 @@ namespace Warehouser_NET
         private void Load_Part()
         {
             Load_Page(page);
+        }
+
+
+        private void PageMinus_Click(object sender, RoutedEventArgs e)
+        {
+            if (page > 1)
+            {
+                page--;
+                Load_Page(page);
+            }
+        }
+
+        private void PagePlus_Click(object sender, RoutedEventArgs e)
+        {
+            if (page <= HiroUtils.GetPage(ishelves.Count))
+            {
+                page++;
+                Load_Page(page);
+            }
         }
     }
 }

@@ -97,7 +97,7 @@ namespace Warehouser_NET
                     uc.Hide = VisibilityBox.SelectedIndex == 1 ? true : false;
                     uc.HideStr = uc.Hide ? "隐藏" : "可见";
                 });
-                var jn = HiroUtils.ParseJson(HiroUtils.SendRequest("/usage", new List<string>() { "action", "usage", "username", "token", "device" },
+                var jn = HiroUtils.ParseJson(HiroUtils.SendRequest("/usage", new List<string>() { "action", "function", "username", "token", "device" },
                         new List<string>() { "1", uc.toJson().ToString(), HiroUtils.userName, HiroUtils.userToken, "PC" }));
                 if (jn != null)
                     Dispatcher.Invoke(() =>

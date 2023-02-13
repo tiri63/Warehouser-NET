@@ -29,7 +29,7 @@ namespace Warehouser_NET
             int count;
             if (!int.TryParse(json["count"].ToString(), out count))
                 count = -1;
-            var usage = json["usage"].ToString().Replace("{", "").Replace("}", "").Split(",");
+            var usage = json["function"].ToString().Replace("{", "").Replace("}", "").Split(",");
             List<int> uin = new List<int>();
             string ust = string.Empty;
             foreach (var usa in usage)
@@ -138,6 +138,85 @@ namespace Warehouser_NET
         }
     }
 
+    public class ItemClassForImport : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private string shelf;
+        private string uid;
+        private int count;
+        private string functionString;
+        private List<int> functions = new List<int>();
+
+        public string Shelf
+        {
+            get { return shelf; }
+            set
+            {
+                shelf = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Shelf)));
+            }
+        }
+
+        public string UID
+        {
+            get { return uid; }
+            set
+            {
+                uid = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UID)));
+            }
+        }
+
+        public int Count
+        {
+            get { return count; }
+            set
+            {
+                count = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
+            }
+        }
+
+        public List<int> Functions
+        {
+            get { return functions; }
+            set
+            {
+                functions = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Functions)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FunctionString)));
+            }
+        }
+
+        public string FunctionString
+        {
+            get { return functionString; }
+            set
+            {
+                functionString = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FunctionString)));
+            }
+        }
+
+        internal object toJson()
+        {
+            var a = string.Empty;
+            foreach (var i in Functions)
+            {
+                if (a.Equals(string.Empty))
+                    a = i.ToString();
+                else
+                    a = a + "," + i.ToString();
+            };
+            var ret = new JsonObject();
+            ret.Add("shelf", Shelf);
+            ret.Add("uid", UID);
+            ret.Add("count", Count.ToString());
+            ret.Add("function", a);
+            return ret;
+        }
+    }
+
     public class UserClass : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -242,11 +321,17 @@ namespace Warehouser_NET
 
         public override string ToString()
         {
-            return "此分支已废弃";
-            /*return $"账户 : \t\t{Name}{Environment.NewLine}" +
+            return $"账户 : \t\t{Name}{Environment.NewLine}" +
                 $"名称 : \t\t{Nickname}{Environment.NewLine}" +
-                $"部门信息 : \t{Depart.ToString()}{Environment.NewLine}" +
-                $"角色 : \t\t{Role}";*/
+                $"部门 : \t\t{Depart.ToString()}{Environment.NewLine}" +
+                $"角色 : \t\t{Role}";
+        }
+
+        public string ToStringWithoutRole()
+        {
+            return $"账户 : \t\t{Name}{Environment.NewLine}" +
+                $"名称 : \t\t{Nickname}{Environment.NewLine}" +
+                $"部门 : \t\t{Depart.ToString()}{Environment.NewLine}";
         }
 
         public JsonNode toJson()
@@ -679,6 +764,175 @@ namespace Warehouser_NET
             ret.Add("id", ID.ToString());
             ret.Add("name", Name);
             return ret;
+        }
+    }
+
+    public class LogClass : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private UIDClass uid;
+        private UserClass user;
+        private string shelf;
+        private string unixTime;
+        private string dateTime;
+        private int category;
+        private string categoryString;
+        private int count;
+        private string usageText;
+
+
+        public static LogClass Parse(string str)
+        {
+            var json = JsonObject.Parse(str);
+            return Parse(json);
+        }
+
+        public static LogClass Parse(JsonNode json)
+        {
+            UIDClass uid = UIDClass.Parse(json["uid"].ToString());
+            UserClass user = UserClass.Parse(json["user"].ToString());
+            var ca = -1;
+            int.TryParse(json["action"].ToString(), out ca);
+            var co = -1;
+            int.TryParse(json["count"].ToString(), out co);
+            var ti = json["time"].ToString();
+            var usage = json["function"].ToString().Replace("{", "").Replace("}", "").Split(",");
+            List<int> uin = new List<int>();
+            string ust = string.Empty;
+            foreach (var usa in usage)
+            {
+                int oint;
+                if (int.TryParse(usa, out oint))
+                {
+                    uin.Add(oint);
+                    foreach (var us in HiroUtils.usages)
+                    {
+                        if (us.Code == oint)
+                        {
+                            if (ust == string.Empty)
+                                ust = us.Info;
+                            else
+                                ust = ust + "," + us.Info;
+                        }
+                    }
+                }
+
+            }
+            DateTime dtStart = TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1, 0, 0, 0, 0));
+            long lTime = long.Parse(ti + "0000000");
+            TimeSpan toNow = new TimeSpan(lTime);
+            DateTime dtResult = dtStart.Add(toNow);
+            return new LogClass()
+            {
+                Category = ca,
+                CategoryString = ca != 0 ? "出库" : "入库",
+                Count = co,
+                UnixTime = ti,
+                DateTime = dtResult.ToString("yyyy-MM-dd HH:mm:ss"),
+                Shelf = json["sfid"].ToString(),
+                UID = uid,
+                User = user,
+                UsageText = ust
+            };
+        }
+
+        public UserClass User
+        {
+            get { return user; }
+            set
+            {
+                user = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(User)));
+            }
+        }
+
+        public UIDClass UID
+        {
+            get { return uid; }
+            set
+            {
+                uid = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UID)));
+            }
+        }
+        public string Shelf
+        {
+            get { return shelf; }
+            set
+            {
+                shelf = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Shelf)));
+            }
+        }
+
+        public string UnixTime
+        {
+            get { return unixTime; }
+            set
+            {
+                unixTime = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UnixTime)));
+            }
+        }
+
+        public string DateTime
+        {
+            get { return dateTime; }
+            set
+            {
+                dateTime = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DateTime)));
+            }
+        }
+
+        public int Count
+        {
+            get { return count; }
+            set
+            {
+                count = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
+            }
+        }
+
+        public int Category
+        {
+            get { return category; }
+            set
+            {
+                category = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Category)));
+            }
+        }
+
+        public string CategoryString
+        {
+            get { return categoryString; }
+            set
+            {
+                categoryString = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CategoryString)));
+            }
+        }
+
+        public string UsageText
+        {
+            get { return usageText; }
+            set
+            {
+                usageText = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UsageText)));
+            }
+        }
+        public override string ToString()
+        {
+            return $"时间:\t\t{DateTime}{Environment.NewLine}" +
+                $"出\\入:\t\t{CategoryString}{Environment.NewLine}" +
+                $"货架ID:\t\t{Shelf}{Environment.NewLine}" +
+                $"{UID.ToString()}" +
+                $"数量:\t\t{Count}{Environment.NewLine}" +
+                $"{User.ToStringWithoutRole()}" +
+                $"用途:\t\t{UsageText}";
         }
     }
     #region 通知项目定义

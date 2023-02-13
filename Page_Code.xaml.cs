@@ -394,5 +394,23 @@ namespace Warehouser_NET
                 }).Start();
             }
         }
+        private void PageMinus_Click(object sender, RoutedEventArgs e)
+        {
+            if (page > 1)
+            {
+                page--;
+                Load_Page(page);
+            }
+        }
+
+        private void PagePlus_Click(object sender, RoutedEventArgs e)
+        {
+            var ap = flag == 0 ? HiroUtils.GetPage(code_all.Count) : HiroUtils.GetPage(code_search.Count);
+            if (page <= ap)
+            {
+                page++;
+                Load_Page(page);
+            }
+        }
     }
 }

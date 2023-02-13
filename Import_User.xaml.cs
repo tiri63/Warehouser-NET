@@ -242,7 +242,7 @@ namespace Warehouser_NET
                                 Password = GetCellValue(row.GetCell(1)),
                                 Nickname = GetCellValue(row.GetCell(2)),
                                 Depart = HiroUtils.depart_all.Where(x => x.ID == d).FirstOrDefault(),
-                                Privilege = i,
+                                Privilege = i + 1,
                                 Role = r
                             });
                         });
@@ -499,7 +499,7 @@ namespace Warehouser_NET
 
         private void EnsureBtn_Click(object sender, RoutedEventArgs e)
         {
-            var i = DepartCombo.SelectedIndex;
+            var i = RoleCombo.SelectedIndex;
             i = i >= 0 && i <= HiroUtils.roles.Count ? i : i < 0 ? 0 : HiroUtils.roles.Count;
             var target = new UserClass
             {
@@ -517,6 +517,25 @@ namespace Warehouser_NET
                 iusers.Add(target);
             HideDetail();
             Load_Part();
+        }
+
+
+        private void PageMinus_Click(object sender, RoutedEventArgs e)
+        {
+            if (page > 1)
+            {
+                page--;
+                Load_Page(page);
+            }
+        }
+
+        private void PagePlus_Click(object sender, RoutedEventArgs e)
+        {
+            if (page <= HiroUtils.GetPage(iusers.Count))
+            {
+                page++;
+                Load_Page(page);
+            }
         }
     }
 }

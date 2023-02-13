@@ -350,7 +350,7 @@ namespace Warehouser_NET
                             if (i * 20 + j >= iues.Count)
                                 break;
                             ja.Add(iues[i * 20 + j].toJson());
-                            var jo = HiroUtils.ParseJson(HiroUtils.SendRequest("/usage", new List<string>() { "action", "username", "token", "device", "usages" },
+                            var jo = HiroUtils.ParseJson(HiroUtils.SendRequest("/usage", new List<string>() { "action", "username", "token", "device", "functions" },
                             new List<string>() { "3", HiroUtils.userName, HiroUtils.userToken, "PC", ja.ToString().Replace(Environment.NewLine, " ") }));
                             if (jo != null)
                             {
@@ -384,7 +384,7 @@ namespace Warehouser_NET
                     {
                         ja.Add(i.toJson());
                     };
-                    var jo = HiroUtils.ParseJson(HiroUtils.SendRequest("/usage", new List<string>() { "action", "username", "token", "device", "usages" },
+                    var jo = HiroUtils.ParseJson(HiroUtils.SendRequest("/usage", new List<string>() { "action", "username", "token", "device", "functions" },
                             new List<string>() { "3", HiroUtils.userName, HiroUtils.userToken, "PC", ja.ToString() }));
                     Dispatcher.Invoke(() =>
                     {

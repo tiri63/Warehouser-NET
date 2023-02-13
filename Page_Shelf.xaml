@@ -12,7 +12,9 @@
         <DockPanel x:Name="ItemPanel">
             <DockPanel x:Name="SubPanel" DockPanel.Dock="Top">
                 <Button x:Name="ImportBtn" Content="新增/导入" VerticalAlignment="Center" HorizontalAlignment="Left" Width="90" Height="20" Click="ImportBtn_Click"></Button>
+                <Button x:Name="PageMinus" Content="◀"  VerticalAlignment="Center" HorizontalAlignment="Left" Width="30" Height="20" Click="PageMinus_Click" ></Button>
                 <Label x:Name="StatusLabel" Content="共计{0}项"  VerticalAlignment="Center" HorizontalAlignment="Left"></Label>
+                <Button x:Name="PagePlus" Content="▶"  VerticalAlignment="Center" HorizontalAlignment="Left" Width="30" Height="20" Click="PagePlus_Click" ></Button>
                 <Grid Width="10"></Grid>
                 <Button x:Name="QRCodeBtn" Content="生成二维码" VerticalAlignment="Center" HorizontalAlignment="Left" Width="90" Height="20" Click="QRCodeBtn_Click"/>
                 <Grid Width="10"></Grid>

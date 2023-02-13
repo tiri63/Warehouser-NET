@@ -15,7 +15,9 @@
                 <Grid Width="10"></Grid>
                 <Button x:Name="ImportClipboard" Content="从剪辑板导入" VerticalAlignment="Center" HorizontalAlignment="Left" Width="90" Height="20" Click="ImportClipboard_Click"></Button>
                 <Grid Width="10"></Grid>
+                <Button x:Name="PageMinus" Content="◀"  VerticalAlignment="Center" HorizontalAlignment="Left" Width="30" Height="20" Click="PageMinus_Click" ></Button>
                 <Label x:Name="StatusLabel" Content="共计{0}项"  VerticalAlignment="Center" HorizontalAlignment="Left"></Label>
+                <Button x:Name="PagePlus" Content="▶"  VerticalAlignment="Center" HorizontalAlignment="Left" Width="30" Height="20" Click="PagePlus_Click" ></Button>
                 <Button x:Name="NewBtn" Content="新增"  VerticalAlignment="Center" HorizontalAlignment="Left" Width="50" Height="20" Click="NewBtn_Click"></Button>
                 <Grid Width="10"></Grid>
                 <Button x:Name="DeleteBtn" Content="删除"  VerticalAlignment="Center" HorizontalAlignment="Left" Width="50" Height="20" Click="DeleteBtn_Click"></Button>
@@ -101,7 +103,7 @@
                         <Label x:Name="DescribeLabel" Content="描述"  FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="15" Margin="0,175,0,0" Height="30"/>
                     </Grid>
                     <Grid x:Name="TextGrid" DockPanel.Dock="Right" Margin="10,10,10,0">
-                        <TextBox x:Name="UIDText" Text="1001" IsReadOnly="True" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Left" FontSize="15" Margin="0" Height="30" Width="350"/>
+                        <TextBox x:Name="UIDText" Text="1001" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Left" FontSize="15" Margin="0" Height="30" Width="350"/>
                         <TextBox x:Name="DepartText" Text="1" IsReadOnly="True" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Left" FontSize="15" Margin="0,35,0,0" Height="30" Width="350"/>
                         <TextBox x:Name="MainText" Text="1" IsReadOnly="True" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Left" FontSize="15" Margin="0,70,0,0" Height="30" Width="350"/>
                         <TextBox x:Name="SubText" Text="1" IsReadOnly="True" FontFamily="Microsoft YaHei" Foreground="{DynamicResource FontColorBrush}" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Left" FontSize="15" Margin="0,105,0,0" Height="30" Width="350"/>
@@ -110,7 +112,7 @@
                     </Grid>
                 </DockPanel>
                 <Grid x:Name="Ensure"  DockPanel.Dock="Bottom" Margin="0,10,0,10">
-                    <Button x:Name="OKBtn1" Content="OK" HorizontalAlignment="Left" Width="40" Margin="364,0,0,0" Height="20" VerticalAlignment="Bottom" Click="OKBtn1_Click"/>
+                    <Button x:Name="OKBtn1" Content="OK" HorizontalAlignment="Right" Width="40" Margin="0,0,60,0" Height="20" VerticalAlignment="Bottom" Click="OKBtn1_Click"/>
                     <Button x:Name="CancelBtn" Content="取消" VerticalAlignment="Center" HorizontalAlignment="Right" Width="40" Height="20" Margin="0,0,10,0" Click="CancelBtn_Click" />
                 </Grid>
             </DockPanel>

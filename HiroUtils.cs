@@ -24,8 +24,8 @@ public class HiroUtils
     internal static string? userToken = null;
     internal static string? userDepart = null;
     internal static string? userNickname = null;
-    //internal const string baseURL = "http://10.3.201.64/warehouser";
-    internal const string baseURL = "http://101.34.8.69/warehouser";
+    internal const string baseURL = "http://10.3.201.64/warehouser";
+    //internal const string baseURL = "http://101.34.8.69/warehouser";//hiro's server
     internal static HttpClient? hc = null;
     internal static string LogFilePath = "<current>\\users\\<hiuser>\\log\\";
     internal static string ConfigFilePath = "<current>\\users\\<hiuser>\\user.hsf";
@@ -309,7 +309,7 @@ public class HiroUtils
     {
         try
         {
-            var filePath = Path_Prepare(LogFilePath) + DateTime.Now.ToString("yyyy-MM-dd") + ".log";
+            var filePath = Path_Prepare(LogFilePath) + "log.log";
             if (!File.Exists(filePath))
                 File.Create(filePath).Close();
             FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.ReadWrite);

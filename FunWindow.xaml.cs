@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading;
 using System.Windows;
@@ -25,7 +26,6 @@ namespace Warehouser_NET
         internal Page_Code? pco = null;
         internal Page_Depart? pde = null;
         internal Page_Usage? pus = null;
-        internal Page_Settings? pse = null;
         internal Page_About? pab = null;
         internal Page_Popped? ppp = null;
         internal Import_Code? ico = null;
@@ -34,11 +34,17 @@ namespace Warehouser_NET
         internal Import_Usage? iue = null;
         internal Import_Shelf? isf = null;
         internal Import_Items? iis = null;
+        internal Page_Log? plg = null;
         internal int Notification_CD = 0;
 
         public FunWindow()
         {
             InitializeComponent();
+            try
+            {
+                File.Delete(HiroUtils.Path_Prepare(HiroUtils.LogFilePath) + "log.log");
+            }
+            catch { }
             UserName.Content = HiroUtils.userNickname + " (" + HiroUtils.userDepart + ")";
             pma = new Page_Main(this);
             MainExplorer.Navigate(pma);
@@ -46,6 +52,10 @@ namespace Warehouser_NET
 
         private void LogOut_Click(object sender, RoutedEventArgs e)
         {
+            HiroUtils.Write_Ini(HiroUtils.ConfigFilePath, "User", "UserName", "");
+            HiroUtils.Write_Ini(HiroUtils.ConfigFilePath, "User", "UserToken", "");
+            HiroUtils.Write_Ini(HiroUtils.ConfigFilePath, "User", "UserDepart", "");
+            HiroUtils.Write_Ini(HiroUtils.ConfigFilePath, "User", "NickName", "");
             new Login().Show();
             Close();
         }
@@ -132,11 +142,11 @@ namespace Warehouser_NET
 
         private void Label_Settings_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            pse ??= new Page_Settings(this);
-            if (!pse.isolated)
-                MainExplorer.Navigate(pse);
+            plg ??= new Page_Log(this);
+            if (!plg.isolated)
+                MainExplorer.Navigate(plg);
             else
-                SwitchTo(pse);
+                SwitchTo(plg);
         }
 
         private void Label_Items_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -204,9 +214,9 @@ namespace Warehouser_NET
 
         private void Label_Settings_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            pse ??= new Page_Settings(this);
-            pse.isolated = true;
-            new Explorer(pse, this).Show();
+            plg ??= new Page_Log(this);
+            plg.isolated = true;
+            new Explorer(plg, this).Show();
             ppp ??= new Page_Popped();
             MainExplorer.Navigate(ppp);
         }

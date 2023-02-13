@@ -8,5 +8,6 @@
         Title="初始化……" Height="245" Width="445" ResizeMode="NoResize" WindowStyle="None" WindowStartupLocation="CenterScreen" ShowInTaskbar="False" Background="{DynamicResource BackgroundColorBrush}" Closing="StartWin_Closing">
     <Grid>
         <Label x:Name="StartWinLabel" Content="正在初始化……" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,0,10"></Label>
+        <ProgressBar x:Name="MsgProgressBar"  IsIndeterminate="True" DockPanel.Dock="Top" Height="15" Margin="20,10,20,20"/>
     </Grid>
 </Window>

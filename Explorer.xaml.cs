@@ -44,7 +44,7 @@ namespace Warehouser_NET
                 case Page_Main pma:
                     pma.isolated = false;
                     break;
-                case Page_Settings pse:
+                case Page_Log pse:
                     pse.isolated = false;
                     break;
                 case Page_Shelf psh:

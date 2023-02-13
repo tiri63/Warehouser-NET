@@ -451,10 +451,23 @@ namespace Warehouser_NET
             return bmpimg;
         }
 
-        public static void Get_Text_Visual_Width(FormattedText ft, double pixelPerDip, out System.Windows.Size size)
+        private void PageMinus_Click(object sender, RoutedEventArgs e)
         {
-            size.Width = ft.Width;
-            size.Height = ft.Height;
+            if (page > 1)
+            {
+                page--;
+                Load_Page(page);
+            }
+        }
+
+        private void PagePlus_Click(object sender, RoutedEventArgs e)
+        {
+            var ap = flag == 0 ? HiroUtils.GetPage(shelf_all.Count) : HiroUtils.GetPage(shelf_search.Count);
+            if (page <= ap)
+            {
+                page++;
+                Load_Page(page);
+            }
         }
     }
 }
